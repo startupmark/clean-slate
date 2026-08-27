@@ -1,0 +1,65 @@
+name: Propose a scoring signal
+description: A new heuristic for deciding what is worth reading.
+title: "Signal: "
+labels: ["scoring"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        One rule shapes every scoring change: **a signal that cannot explain
+        itself does not ship.** Every rule produces a short, human-readable reason shown
+        to the user on the post it affected. If you cannot write that sentence, the signal
+        is not ready.
+
+  - type: textarea
+    id: signal
+    attributes:
+      label: What should the signal detect?
+      description: Describe the kind of post, and what observable property separates it from everything else.
+    validations:
+      required: true
+
+  - type: input
+    id: reason
+    attributes:
+      label: The reason shown to the user
+      description: The exact sentence fragment that would appear on an affected post, in the style of "Poll", "Engagement-bait formatting", "1st-degree connection".
+      placeholder: "Cross-posted from another network"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: direction
+    attributes:
+      label: Should this raise or lower a post's score?
+      options:
+        - "Lower, this is usually noise"
+        - "Raise, this usually signals something worth reading"
+    validations:
+      required: true
+
+  - type: textarea
+    id: false-positives
+    attributes:
+      label: What would it wrongly catch?
+      description: |
+        The most useful part of this issue. Every heuristic here has a failure mode:
+        "long post" catches thoughtful essays *and* rambling. Name yours.
+    validations:
+      required: true
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: Example posts
+      description: Sanitized or invented examples that the signal should and should not catch. Please do not paste real posts from real people.
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        If you want to implement it: scoring lives in `extension/engine.js` as pure functions,
+        and `test/` covers it with no dependencies (`npm test`). New logic belongs in
+        `engine.js` if it can be written as a pure function, because that is the half that
+        can be tested.

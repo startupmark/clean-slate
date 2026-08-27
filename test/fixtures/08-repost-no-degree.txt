@@ -1,0 +1,16 @@
+# key: expanded-urn-li-activity-7008_FeedType_ugcPost
+# author: Aiden Cross
+# degree: null
+# hasSocialContext: true
+# outcome: hide
+---
+Feed post
+Elena Moreau reposted this
+Aiden Cross
+Principal engineer at Harborline
+3d
+We spent half a year migrating off a service mesh that we never actually needed, and the write-up is finally public. The short version: our traffic never justified the operational surface area we took on.
+Like
+Comment
+Repost
+Send

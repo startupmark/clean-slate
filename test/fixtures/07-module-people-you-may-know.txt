@@ -1,0 +1,18 @@
+# key: expanded-urn-li-module-pymk_FeedType_module
+# author: People you may know
+# isModule: true
+# outcome: hide
+# maxScore: 0
+---
+Feed post
+People you may know
+See all
+Ana Duarte
+Product Manager at Northwind
+Connect
+Luis Marin
+Design Lead at Harborline
+Connect
+Priya Nair
+Data Engineer at Meridian
+Connect

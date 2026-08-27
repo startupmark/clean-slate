@@ -1,0 +1,20 @@
+# key: expanded-urn-li-activity-7001_FeedType_ugcPost
+# author: Priya Raman
+# degree: 1st
+# hasSocialContext: false
+# isSponsored: false
+# isPoll: false
+# isBroetry: false
+# outcome: keep
+# minScore: 80
+---
+Feed post
+Priya Raman
+Staff engineer, developer tools at Harborline • 1st
+2h
+Spent the week replacing our bespoke CI runner with a boring off-the-shelf one. Build times dropped 40% and, more importantly, nobody has to page the platform team when a cache key goes stale. The lesson keeps repeating: the clever infrastructure you maintain yourself is rarely worth what it costs to keep alive.
+Like
+Comment
+Repost
+Send
+124

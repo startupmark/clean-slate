@@ -1,0 +1,18 @@
+# key: expanded-urn-li-activity-7015_FeedType_recommendation
+# author: Recommended for you
+# isModule: true
+# isSponsored: false
+# outcome: hide
+# maxScore: 0
+---
+Feed post
+Recommended for you
+Marta Lindqvist
+Building AI GTM systems | former CEO and co-founder at Northwind
+Followed by 474 shared connections
+Follow
+Sam Ortega
+Founder and CEO at Harborline
+Followed by 255 shared connections
+Follow
+Show more

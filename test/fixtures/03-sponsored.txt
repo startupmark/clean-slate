@@ -1,0 +1,14 @@
+# key: expanded-urn-li-activity-7003_FeedType_ugcPost
+# author: Northwind Analytics
+# isSponsored: true
+# hasSocialContext: false
+# outcome: hide
+# maxScore: 0
+---
+Feed post
+Northwind Analytics
+Promoted
+Your dashboards should not take a quarter to build. See how teams ship their first board in an afternoon, with governance built in from day one.
+Learn more
+Like
+Comment

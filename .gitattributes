@@ -1,0 +1,6 @@
+# The fixtures are split on a literal LF divider. Checked out with CRLF — the
+# Git for Windows default — the divider stops matching and the whole test suite
+# fails on a fresh clone while staying green on Linux CI.
+test/fixtures/*.txt text eol=lf
+
+*.woff2 binary

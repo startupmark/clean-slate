@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Privacy and data questions
+    url: https://github.com/startupmark/clean-slate/blob/main/PRIVACY.md
+    about: Clean Slate makes zero network calls and stores everything locally. The privacy policy states exactly what is stored and where.
+  - name: Contributing and the CLA
+    url: https://github.com/startupmark/clean-slate/blob/main/CONTRIBUTING.md
+    about: How to run the tests, what makes a good contribution, and the CLA you agree to on your first pull request.

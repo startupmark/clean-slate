@@ -1,0 +1,58 @@
+name: Add or fix a language
+description: Extend the signals beyond English, or correct an existing locale.
+title: "Locale: "
+labels: ["locale"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Several scoring signals key off English strings: "Promoted", "likes this",
+        connection-degree markers. On a non-English feed those simply never match, so
+        the extension quietly under-filters.
+
+        All of it lives in [`extension/detection.json`](https://github.com/startupmark/clean-slate/blob/main/extension/detection.json)
+        as data, so **adding a language is a data change, not a code change.** If you are
+        comfortable opening a pull request, that is welcome. Otherwise fill this in
+        and someone can make the change for you.
+
+  - type: input
+    id: language
+    attributes:
+      label: Language
+      description: Name and the two-letter code LinkedIn uses.
+      placeholder: "German (de)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: strings
+    attributes:
+      label: The equivalents in your language
+      description: |
+        As many as you can give. Exact wording as LinkedIn renders it, please, because
+        these become regular expressions matched against the page text.
+      value: |
+        Promoted / Sponsored:
+        "… likes this" / "… commented" / "… reposted this" / "Followed by …":
+        Connection degrees (1st / 2nd / 3rd):
+        "See results" (on polls):
+        Feed module headings ("People you may know", "LinkedIn News", "Suggested for you"):
+        Post UI buttons (Like / Comment / Repost / Send / See more):
+    validations:
+      required: true
+
+  - type: textarea
+    id: bait
+    attributes:
+      label: Engagement-bait phrases in your language
+      description: The local equivalents of "Agree?", "Thoughts?", "Comment below", "Repost if…". Idiomatic beats literal here.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: correction
+    attributes:
+      label: Is this a correction?
+      options:
+        - label: A locale already exists for this language and something in it is wrong or missing.
+          required: false

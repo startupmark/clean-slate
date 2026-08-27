@@ -1,0 +1,175 @@
+/* Surfaces injected into LinkedIn's page.
+ *
+ * Design system rules, in short: one accent (signal) for decisions and actions
+ * only; clay for destructive and breakage only; borders instead of shadows, with
+ * one elevation level for floating panels; 3px radius on controls, 4px on cards,
+ * 6px on panels; a left signal edge on every surface, 4px top edge on panels.
+ *
+ * --cs-quiet may NOT carry text. It is 2.78:1 on paper and no darker value stays
+ * distinct from --cs-slate. Receding text uses --cs-slate.
+ *
+ * Faces are bundled and loaded by fonts.css. The fallback stacks below stay
+ * declared: they carry any glyph outside the bundled subsets. Never add a
+ * webfont link here. See DEVELOPING.md.
+ */
+:root {
+  --cs-ink:#18232e; --cs-ink-soft:#3a4a58; --cs-slate:#61717d; --cs-quiet:#8b99a4;
+  --cs-line:#d8e2e7; --cs-hairline:#eaf0f3; --cs-paper:#f7fafb; --cs-surface:#ffffff;
+  --cs-signal:#106b8e; --cs-signal-deep:#06465f; --cs-signal-line:#a8ccda; --cs-signal-tint:#eaf4f8;
+  --cs-clay:#9d443b; --cs-clay-tint:#f7edeb;
+  --cs-on-signal:#ffffff; --cs-on-clay:#ffffff;
+  --cs-shadow-lg:rgb(24 35 46 / 18%); --cs-shadow-sm:rgb(24 35 46 / 7%);
+  --cs-ring:rgb(16 107 142 / 26%);
+  --cs-sans:Jost,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --cs-serif:Newsreader,Georgia,"Times New Roman",serif;
+  --cs-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+
+/* Dark mode. LinkedIn marks its own theme on <body data-color-scheme>; the media
+   query covers users whose OS is dark before LinkedIn paints that attribute.
+   Same geometry, same weights — only the ramp flips, and filled buttons take
+   near-black text. */
+body[data-color-scheme="dark"] {
+  --cs-ink:#e6edf3; --cs-ink-soft:#c3d0da; --cs-slate:#9fb0bd; --cs-quiet:#75858f;
+  --cs-line:#33414f; --cs-hairline:#26313c; --cs-paper:#101821; --cs-surface:#18222d;
+  --cs-signal:#4db3d8; --cs-signal-deep:#7fcbe8; --cs-signal-line:#2f5c6e; --cs-signal-tint:#172b36;
+  --cs-clay:#e2726a; --cs-clay-tint:#2b1e1c;
+  --cs-on-signal:#0b1219; --cs-on-clay:#0b1219;
+  --cs-shadow-lg:rgb(0 0 0 / 52%); --cs-shadow-sm:rgb(0 0 0 / 34%);
+  --cs-ring:rgb(77 179 216 / 30%);
+}
+@media (prefers-color-scheme:dark) {
+  body:not([data-color-scheme="light"]) {
+    --cs-ink:#e6edf3; --cs-ink-soft:#c3d0da; --cs-slate:#9fb0bd; --cs-quiet:#75858f;
+    --cs-line:#33414f; --cs-hairline:#26313c; --cs-paper:#101821; --cs-surface:#18222d;
+    --cs-signal:#4db3d8; --cs-signal-deep:#7fcbe8; --cs-signal-line:#2f5c6e; --cs-signal-tint:#172b36;
+    --cs-clay:#e2726a; --cs-clay-tint:#2b1e1c;
+    --cs-on-signal:#0b1219; --cs-on-clay:#0b1219;
+    --cs-shadow-lg:rgb(0 0 0 / 52%); --cs-shadow-sm:rgb(0 0 0 / 34%);
+    --cs-ring:rgb(77 179 216 / 30%);
+  }
+}
+
+/* Hiding a post drops its own children; the injected card stays visible. Never
+   remove or reparent LinkedIn's nodes — React owns them. */
+.cs-hidden-post > *:not(.cs-card):not(.cs-digest) { display:none !important; }
+.cs-collapsed { display:none !important; }
+.cs-rail-hidden,.cs-box-hidden { display:none !important; }
+/* A "maybe" is signalled by draining colour, never by fading text. Opacity
+   composites LinkedIn's own text against the page: at .58 its body text falls to
+   4.32:1 and its secondary text to 2.43:1, and no opacity below .9 clears AA —
+   by which point nothing looks dimmed. The verdict label carries the meaning. */
+.cs-dimmed { filter:saturate(.5); transition:filter 140ms ease; }
+.cs-dimmed:hover,.cs-dimmed:focus-within { filter:none; }
+
+/* ---------- hidden-post card · the core object ---------- */
+
+.cs-card { box-sizing:border-box; margin:8px 0 12px; padding:15px 17px; border:1px solid var(--cs-line); border-left:3px solid var(--cs-signal); border-radius:4px; background:var(--cs-paper); color:var(--cs-ink); font-family:var(--cs-sans); box-shadow:0 2px 8px var(--cs-shadow-sm); }
+.cs-card__topline { display:flex; align-items:center; justify-content:space-between; gap:12px; color:var(--cs-signal-deep); font-size:12px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; }
+/* The score is mono: a number to read. */
+.cs-card__score { color:var(--cs-slate); font-family:var(--cs-mono); font-size:12.5px; font-weight:400; letter-spacing:0; text-transform:none; }
+.cs-card__author { margin:9px 0 3px; color:var(--cs-ink); font-size:15px; font-weight:500; }
+.cs-card__summary { overflow:hidden; margin:0; color:var(--cs-slate); font-size:14px; line-height:1.45; text-overflow:ellipsis; white-space:nowrap; }
+.cs-card__reason { margin:11px 0 0; color:var(--cs-slate); font-size:13.5px; line-height:1.4; }
+.cs-card__actions { display:flex; flex-wrap:wrap; gap:7px; margin-top:13px; }
+/* Marked out from the feedback buttons beside it: this one only explains. */
+.cs-card__why { border-style:dashed; }
+
+/* ---------- digest summary ---------- */
+/* Same geometry as the hidden-post card: one verdict about many posts. */
+
+.cs-digest { box-sizing:border-box; margin:8px 0 12px; padding:15px 17px; border:1px solid var(--cs-line); border-left:3px solid var(--cs-signal); border-radius:4px; background:var(--cs-paper); color:var(--cs-ink); font-family:var(--cs-sans); box-shadow:0 2px 8px var(--cs-shadow-sm); }
+.cs-digest__topline { color:var(--cs-signal-deep); font-size:12px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; }
+/* Counts are Newsreader, as in the popup. */
+.cs-digest__count { margin:9px 0 0; color:var(--cs-ink); font-family:var(--cs-serif); font-size:21px; font-weight:400; line-height:1.25; letter-spacing:-.01em; }
+.cs-digest__actions { display:flex; flex-wrap:wrap; gap:7px; margin-top:13px; }
+
+/* ---------- controls ---------- */
+
+.cs-button { appearance:none; min-height:32px; padding:0 12px; border:1px solid var(--cs-line); border-radius:3px; background:var(--cs-surface); color:var(--cs-ink); cursor:pointer; font:500 13px/1 var(--cs-sans); }
+.cs-button:hover { border-color:var(--cs-signal); color:var(--cs-signal-deep); }
+.cs-button--primary { border-color:var(--cs-signal); background:var(--cs-signal); color:var(--cs-on-signal); }
+.cs-button--primary:hover { border-color:var(--cs-signal-deep); background:var(--cs-signal-deep); color:var(--cs-on-signal); }
+
+/* One focus treatment everywhere: 3px signal ring at 26%, offset 2px. */
+.cs-button:focus-visible,.cs-iconbtn:focus-visible,.cs-welcome__close:focus-visible { outline:3px solid var(--cs-ring); outline-offset:2px; }
+
+.cs-iconbtn { min-width:28px; height:26px; padding:0 8px; border:1px solid var(--cs-line); border-radius:3px; background:var(--cs-surface); color:var(--cs-slate); cursor:pointer; font:500 13px/1 var(--cs-sans); }
+.cs-iconbtn:hover { border-color:var(--cs-signal); color:var(--cs-signal-deep); }
+.cs-iconbtn--active { border-color:var(--cs-signal); background:var(--cs-signal); color:var(--cs-on-signal); }
+
+/* ---------- toolbar on kept posts ---------- */
+
+.cs-indicator { display:inline-flex; align-items:center; gap:6px; padding:0; border:0; background:none; color:var(--cs-signal-deep); cursor:pointer; font:500 12px/1.3 var(--cs-sans); }
+.cs-indicator:hover { color:var(--cs-signal); }
+.cs-indicator:focus-visible { outline:3px solid var(--cs-ring); outline-offset:2px; }
+.cs-indicator::before { width:6px; height:6px; border-radius:50%; background:var(--cs-signal); content:""; }
+/* The one non-signal dot in the system. */
+.cs-indicator--maybe { color:var(--cs-slate); }
+.cs-indicator--maybe::before { background:var(--cs-quiet); }
+
+/* The breakdown, opened from the verdict label. Full width under the toolbar so
+   the numbers line up in a column. */
+.cs-breakdown { flex-basis:100%; margin-top:9px; padding:11px 13px; border:1px solid var(--cs-line); border-left:3px solid var(--cs-signal); border-radius:4px; background:var(--cs-paper); }
+.cs-breakdown__head { margin:0 0 8px; color:var(--cs-signal-deep); font:600 12px/1.3 var(--cs-sans); letter-spacing:.08em; text-transform:uppercase; }
+.cs-breakdown__list { margin:0; padding:0; list-style:none; }
+.cs-breakdown__list li { display:flex; gap:10px; padding:2px 0; color:var(--cs-slate); font-size:12.5px; line-height:1.45; }
+.cs-breakdown__delta { flex:none; width:40px; text-align:right; color:var(--cs-ink); font-family:var(--cs-mono); font-size:12.5px; }
+
+.cs-toolbar { display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:8px 14px 0; }
+/* Present at rest, stronger on hover. At opacity:0 these did not exist on a
+   touchscreen at all — while remaining live hit targets — and nothing anywhere
+   told anyone to hover. help.html names all three as if they were visible. */
+.cs-toolbar__actions { display:flex; gap:5px; margin-left:auto; opacity:.62; transition:opacity 120ms ease; }
+@media (hover:none) { .cs-toolbar__actions { opacity:1; } }
+div[role='listitem']:hover .cs-toolbar__actions,.cs-toolbar__actions:focus-within { opacity:1; }
+
+/* ---------- floating surfaces ---------- */
+/* The only shadow in the system; 4px top edge instead of a left one. */
+
+.cs-welcome,.cs-breakage { position:fixed; z-index:2147483647; border:1px solid var(--cs-line); border-radius:6px; background:var(--cs-surface); color:var(--cs-ink); box-shadow:0 16px 46px var(--cs-shadow-lg); font-family:var(--cs-sans); }
+.cs-welcome,.cs-breakage { right:24px; bottom:24px; width:min(370px,calc(100vw - 32px)); }
+
+.cs-welcome { padding:20px; border-top:4px solid var(--cs-signal); }
+.cs-welcome__close { position:absolute; top:10px; right:10px; width:26px; height:26px; padding:0; border:0; border-radius:3px; background:transparent; color:var(--cs-slate); cursor:pointer; font-size:14px; line-height:1; }
+.cs-welcome__close:hover { background:var(--cs-hairline); color:var(--cs-ink); }
+.cs-welcome__eyebrow { color:var(--cs-signal); font-size:11px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; }
+.cs-welcome h2 { margin:9px 0 7px; font-family:var(--cs-serif); font-size:26px; font-weight:400; line-height:1.1; letter-spacing:-.02em; }
+.cs-welcome p { margin:0; color:var(--cs-slate); font-size:15px; line-height:1.48; text-wrap:pretty; }
+/* What the defaults actually are, and that the sidebars were tidied. Quieter
+   than the body copy above it, but it may not use --cs-quiet: that is 2.78:1 and
+   carries non-text only. */
+.cs-welcome__defaults { margin-top:9px !important; padding-top:9px; border-top:1px solid var(--cs-hairline); font-size:13.5px !important; }
+.cs-welcome__actions { display:flex; gap:8px; margin-top:16px; }
+.cs-welcome .cs-button { min-height:32px; padding:0 13px; font-size:13px; }
+
+/* The one surface that earns clay. */
+.cs-breakage { padding:18px 20px; border-top:4px solid var(--cs-clay); }
+.cs-breakage .cs-welcome__eyebrow { color:var(--cs-clay); }
+.cs-breakage h2 { margin:9px 0 7px; font-family:var(--cs-serif); font-size:21px; font-weight:400; line-height:1.1; letter-spacing:-.02em; }
+.cs-breakage p { margin:0; color:var(--cs-slate); font-size:13.5px; line-height:1.45; text-wrap:pretty; }
+.cs-breakage .cs-button { min-height:32px; padding:0 13px; font-size:13px; }
+.cs-breakage .cs-button--primary { border-color:var(--cs-clay); background:var(--cs-clay); color:var(--cs-on-clay); }
+.cs-breakage .cs-button--primary:hover { border-color:var(--cs-clay); background:var(--cs-clay); filter:brightness(.92); }
+
+/* ---------- undo toast ---------- */
+/* A floating surface, so it takes the 4px top edge like the others. Bottom-left
+   keeps it clear of the review pane and LinkedIn's own bottom-right widgets. */
+
+.cs-toast { position:fixed; z-index:2147483647; left:24px; bottom:24px; width:min(340px,calc(100vw - 32px)); padding:14px 16px; border:1px solid var(--cs-line); border-top:4px solid var(--cs-signal); border-radius:6px; background:var(--cs-surface); color:var(--cs-ink); box-shadow:0 16px 46px var(--cs-shadow-lg); font-family:var(--cs-sans); }
+.cs-toast__text { margin:0; font-size:13.5px; line-height:1.45; }
+.cs-toast__actions { display:flex; gap:7px; margin-top:11px; }
+
+/* ---------- review pane ---------- */
+
+
+@media (prefers-reduced-motion:reduce) {
+  .cs-toolbar__actions,.cs-dimmed { transition:none; }
+  /* scrollIntoView({behavior:"smooth"}) is the one motion that was not gated.
+     scroll-behavior covers it without touching the call site. */
+  html { scroll-behavior:auto !important; }
+}
+
+/* Says which of the two silent states the feed is in. Not a panel: no shadow,
+   no border radius beyond the system 3px, and it never takes focus. */
+.cs-paused { position:fixed; right:14px; bottom:14px; z-index:2147483646; padding:6px 11px; border:1px solid var(--cs-line); border-radius:3px; background:var(--cs-surface); color:var(--cs-slate); font:500 12px/1 var(--cs-sans); pointer-events:none; }

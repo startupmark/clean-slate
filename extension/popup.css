@@ -1,0 +1,95 @@
+/* Toolbar popup. Same ramp and rules as content.css, including that --quiet may
+   not carry text. Faces come from fonts.css, linked first by popup.html. */
+:root {
+  --ink:#18232e; --ink-soft:#3a4a58; --slate:#61717d; --quiet:#8b99a4;
+  --line:#d8e2e7; --hairline:#eaf0f3; --paper:#f7fafb; --surface:#ffffff;
+  --signal:#106b8e; --signal-deep:#06465f; --signal-line:#a8ccda; --signal-tint:#eaf4f8;
+  --on-signal:#ffffff; --ring:rgb(16 107 142 / 26%);
+  --sans:Jost,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --serif:Newsreader,Georgia,"Times New Roman",serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark) {
+  :root {
+    --ink:#e6edf3; --ink-soft:#c3d0da; --slate:#9fb0bd; --quiet:#75858f;
+    --line:#33414f; --hairline:#26313c; --paper:#101821; --surface:#18222d;
+    --signal:#4db3d8; --signal-deep:#7fcbe8; --signal-line:#2f5c6e; --signal-tint:#172b36;
+    --on-signal:#0b1219; --ring:rgb(77 179 216 / 30%);
+  }
+}
+
+/* Tells the browser this page has a dark form. Without it Chrome keeps its
+   LIGHT palette for anything it draws itself — link colours, checkboxes,
+   sliders, the select arrow — on a near-black background. */
+:root { color-scheme:light dark; }
+
+* { box-sizing:border-box; }
+body { width:320px; margin:0; background:var(--paper); color:var(--ink); font-family:var(--sans); font-size:15px; }
+main { padding:14px; display:flex; flex-direction:column; gap:8px; }
+
+.masthead { display:flex; align-items:center; gap:11px; }
+/* Inline SVG so the mark takes the theme tokens. */
+.mark { flex:none; }
+.mark__bars { fill:var(--signal); }
+.mark__base { fill:var(--ink); }
+.mark__echo { fill:var(--signal); opacity:.22; }
+.eyebrow { margin:0; color:var(--signal); font-size:12px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; }
+.masthead h1 { margin:2px 0 0; font-family:var(--serif); font-size:21px; font-weight:400; line-height:1.05; letter-spacing:-.02em; }
+
+/* Two lines, not one. Clamped rather than free: the popup is capped at 600px
+   by Chrome and this layout was once 901px tall, so growth stays bounded. One
+   line cut the detection version off the status and made the sentence that
+   explains the current reading mode unreadable, which is all it is for. */
+/* [hidden] is display:none in the UA sheet, and any display here outranks it.
+   renderNudge hides this line to make room for the nudge, and silently did
+   nothing: both rendered, and the popup went over the 600px Chrome allows. */
+.status[hidden] { display:none; }
+.status { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; margin:0; padding:8px 11px; border:1px solid var(--line); border-radius:3px; background:var(--surface); color:var(--slate); font-size:13.5px; line-height:1.4; }
+
+/* The panels went. Four bordered boxes cost roughly 120px of chrome in a
+   window capped at 600, and the group headings carry the same structure. */
+.group { display:flex; flex-direction:column; }
+.label { margin:0 0 7px; color:var(--slate); font-size:12px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; }
+
+/* Two by two: four columns cannot hold "Discover" at 320px. */
+.mode-group { display:grid; grid-template-columns:repeat(2,1fr); gap:5px; }
+.mode-group button { min-height:34px; border:1px solid var(--line); border-radius:3px; background:var(--surface); color:var(--ink); cursor:pointer; font:500 14px var(--sans); }
+.mode-group button:hover { border-color:var(--signal); color:var(--signal-deep); }
+.mode-group button.active { border-color:var(--signal); background:var(--signal); color:var(--on-signal); }
+.help { margin:7px 0 0; color:var(--slate); font-size:13.5px; line-height:1.4; }
+/* One line. The mode copy is a reminder, not documentation; help.html is. */
+#mode-copy { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+
+/* Counters are Newsreader and tabular. */
+.counts { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; text-align:center; }
+.counts strong { display:block; font-family:var(--serif); font-size:23px; font-weight:400; font-variant-numeric:tabular-nums; letter-spacing:-.02em; }
+.counts span { color:var(--slate); font-size:12px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; }
+
+/* The browser's own select: keyboard- and screen-reader-correct for free. */
+#profile { width:100%; min-height:36px; padding:0 9px; border:1px solid var(--line); border-radius:3px; background:var(--surface); color:var(--ink); font:500 14px var(--sans); }
+#profile:hover { border-color:var(--signal); }
+#profile:focus-visible { outline:3px solid var(--ring); outline-offset:2px; }
+
+
+.actions { display:flex; flex-direction:column; gap:6px; }
+.secondary { min-height:34px; padding:0 12px; border:1px solid var(--line); border-radius:3px; background:var(--surface); color:var(--ink); cursor:pointer; font:500 14px var(--sans); text-align:left; }
+.secondary:hover { border-color:var(--signal); color:var(--signal-deep); }
+
+.preferences { display:flex; align-items:center; justify-content:space-between; min-height:36px; padding:0 12px; border:1px solid var(--signal); border-radius:3px; background:var(--signal); color:var(--on-signal); cursor:pointer; font:500 14px var(--sans); }
+.preferences:hover { border-color:var(--signal-deep); background:var(--signal-deep); }
+
+button:focus-visible,input:focus-visible { outline:3px solid var(--ring); outline-offset:2px; }
+
+/* The only thing in the popup that appears unbidden, hence the signal tint. */
+/* Compact and single-line: it appears unbidden, so it must not be the thing
+   that pushes the buttons below the cut. */
+.nudge { overflow:hidden; width:100%; min-height:34px; padding:7px 12px; border:1px solid var(--signal-line); border-radius:3px; background:var(--signal-tint); color:var(--signal-deep); cursor:pointer; font:500 13.5px/1.35 var(--sans); text-align:left; text-overflow:ellipsis; white-space:nowrap; }
+.nudge:hover { border-color:var(--signal); }
+.nudge:focus-visible { outline:3px solid var(--ring); outline-offset:2px; }
+.nudge[hidden] { display:none; }
+
+/* The only route out of the popup to an explanation. Quiet, but always there. */
+.footlinks { margin:0; text-align:center; font-size:13px; }
+.footlinks a { color:var(--signal-deep); text-decoration:none; }
+.footlinks a:hover { color:var(--signal-deep); text-decoration:underline; }
+.footlinks a:focus-visible { outline:3px solid var(--ring); outline-offset:2px; }

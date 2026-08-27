@@ -1,0 +1,16 @@
+# key: expanded-urn-li-activity-7004_FeedType_ugcPost
+# author: Chris Vann
+# degree: 2nd
+# isPoll: true
+# outcome: hide
+---
+Feed post
+Chris Vann
+Founder • 2nd
+3h
+What is the single biggest blocker to shipping weekly at your company right now?
+Code review latency
+Flaky tests
+Stakeholder sign-off
+Something else
+See results

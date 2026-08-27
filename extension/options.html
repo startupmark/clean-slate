@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Clean Slate preferences</title>
+    <link rel="stylesheet" href="fonts.css">
+    <link rel="stylesheet" href="options.css">
+  </head>
+  <body>
+    <main>
+      <header>
+        <svg class="page-mark" viewBox="0 0 48 48" role="img" aria-label="Clean Slate">
+          <g class="mark__bars"><rect x="9" y="13" width="5" height="11" rx="1.5"/><rect x="17" y="7" width="5" height="17" rx="1.5"/><rect x="25" y="16" width="5" height="8" rx="1.5"/><rect x="33" y="10" width="5" height="14" rx="1.5"/></g>
+          <rect class="mark__base" x="6" y="25" width="36" height="3" rx="1.5"/>
+          <g class="mark__echo"><rect x="9" y="29" width="5" height="6" rx="1.5"/><rect x="17" y="29" width="5" height="3" rx="1.5"/><rect x="25" y="29" width="5" height="10" rx="1.5"/><rect x="33" y="29" width="5" height="4" rx="1.5"/></g>
+        </svg>
+        <h1>Preferences</h1><p class="intro">These choices stay in this browser, and they decide what stays in your feed.</p>
+      <p class="intro"><a href="review.html">What it hid</a> · <a href="help.html" target="_blank">How this works</a> · <a href="privacy.html" target="_blank">What is stored, and where</a></p></header>
+      <form id="settings-form">
+        <section>
+          <div class="section-heading"><h2>Profiles</h2></div>
+          <p class="help">A profile is a set of topics, muted phrases, and a Discover threshold. Switch between them from the toolbar popup. The Default profile is the one you get if you never make another.</p>
+          <div class="add-row"><select id="profile-select" aria-label="Profile being edited"></select><button type="button" id="profile-rename">Rename</button><button type="button" id="profile-delete" class="danger">Delete</button></div>
+          <div class="add-row"><input id="profile-name" type="text" placeholder="e.g. Community brain"><button type="button" id="profile-add">Add profile</button></div>
+          <p id="profile-scope" class="learned-summary" role="status"></p>
+        </section>
+        <section>
+          <div class="section-heading"><h2>Topics you want more of</h2></div>
+          <p class="help">Use clear, specific terms. Each match lifts a post's relevance.</p>
+          <div id="interests" class="chips" aria-live="polite"></div>
+          <div class="add-row"><input id="interest-input" type="text" placeholder="e.g. cloud infrastructure"><button type="button" data-add="interests">Add topic</button></div>
+        </section>
+        <section>
+          <div class="section-heading"><h2>Words and phrases to mute</h2></div>
+          <div id="mutedPhrases" class="chips" aria-live="polite"></div>
+          <div class="add-row"><input id="muted-input" type="text" placeholder="e.g. thrilled to announce"><button type="button" data-add="mutedPhrases">Add phrase</button></div>
+        </section>
+        <section>
+          <div class="section-heading"><h2>Never miss these people</h2></div>
+          <p class="help">Their posts always stay visible. Use names exactly as they appear on LinkedIn. Paste a comma or line separated list to add several at once.</p>
+          <div id="allowedAuthors" class="chips" aria-live="polite"></div>
+          <div class="add-row"><input id="allowed-input" type="text" placeholder="e.g. Jane Cooper, Devon Lane"><button type="button" data-add="allowedAuthors">Add people</button><button type="button" data-clear="allowedAuthors" class="danger">Clear the list</button></div>
+        </section>
+        <section>
+          <div class="section-heading"><h2>People to mute</h2></div>
+          <p class="help">Posts from these people are always hidden. You can still open any of them. Names you judged from the feed fade after a while. Each chip says how long it has left, and <strong>pin</strong> stops it fading.</p>
+          <div id="blockedAuthors" class="chips" aria-live="polite"></div>
+          <div class="add-row"><input id="blocked-input" type="text" placeholder="e.g. Hustle McGrindset"><button type="button" data-add="blockedAuthors">Add people</button><button type="button" data-clear="blockedAuthors" class="danger">Clear the list</button></div>
+        </section>
+        <section>
+          <div class="section-heading"><h2>Filter strength</h2></div>
+          <p class="help">Focus hides the most. Discover is the balanced default. Digest keeps only the day's best.</p>
+          <label class="range-label" for="discover-threshold"><span id="threshold-label">Discover threshold</span> <output id="threshold-value"></output></label>
+          <input id="discover-threshold" type="range" min="20" max="75" step="5">
+          <label class="range-label" for="author-decay">Muted people fade after <output id="decay-value"></output></label>
+          <input id="author-decay" type="range" min="0" max="90" step="5">
+          <p class="help">Only people you muted from the feed itself fade. Names you type on this page are a standing preference and stay until you remove them. Set this to 0 to switch fading off.</p>
+          <label class="check"><input id="structural" type="checkbox"> Hide promoted modules and predictable LinkedIn clutter</label>
+          <label class="check"><input id="right-rail" type="checkbox"> Hide the right-hand rail (LinkedIn News, puzzles, ads)</label>
+          <label class="check"><input id="left-rail" type="checkbox"> Hide left sidebar extras (Analytics, Manage, promotions). Your profile box stays.</label>
+        </section>
+        <!-- id="learned" is the popup nudge's destination. Without it the nudge
+             landed at the top of an eight-section page and left people to find
+             the section it was talking about. -->
+        <section id="learned">
+          <div class="section-heading"><h2>What your filter has learned</h2></div>
+          <p class="help">Clean Slate learns from every ★, Hide, Mute and reveal. These are the words it trusts most. Approve one to make it a permanent rule.</p>
+          <p id="learned-summary" class="learned-summary"></p>
+          <div class="learned-cols">
+            <div><h3>Lifts a post</h3><div id="learned-pos" class="chips" aria-live="polite"></div></div>
+            <div><h3>Sinks a post</h3><div id="learned-neg" class="chips" aria-live="polite"></div></div>
+          </div>
+          <p class="help">The <strong>+</strong> on a word makes it a permanent rule. The <strong>×</strong> makes the filter forget that one word, without touching the rest.</p>
+          <div class="data-actions learned-reset"><button type="button" id="reset-model" class="danger">Forget everything learned</button></div>
+        </section>
+        <section class="data-section">
+          <div class="section-heading"><h2>Your data</h2></div>
+          <p class="help">Everything is stored on this machine. <a href="privacy.html" target="_blank">What is stored</a>.</p>
+          <div class="data-actions"><button type="button" id="export">Export settings</button><button type="button" id="import">Import settings</button><button type="button" id="reset-counters">Reset counters</button><button type="button" id="reset" class="danger">Delete all Clean Slate data</button></div>
+          <input id="import-file" type="file" accept="application/json,.json" hidden>
+          <p class="help">Export writes your settings and everything the filter has learned to a file. Import reads one back and replaces both. That is how you move to a new machine, or come back after a reinstall.</p>
+          <p class="help">The log of hidden posts stays out of the file. It holds other people’s writing, and that belongs on the machine where it was read.</p>
+        </section>
+        <footer><span id="saved" role="status"></span><button type="submit" class="save">Save changes</button></footer>
+        <p id="pending" class="help" role="status" hidden>Unsaved changes. Import, the resets and “Forget everything learned” happen straight away. Everything else waits for Save.</p>
+      </form>
+    </main>
+    <!-- engine.js first: the import path uses its validator. -->
+    <script src="engine.js"></script>
+    <script src="options.js"></script>
+  </body>
+</html>

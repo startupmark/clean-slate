@@ -1,0 +1,10 @@
+{
+  "extensionName": {
+    "message": "Clean Slate",
+    "description": "The extension's name, as shown in the browser."
+  },
+  "extensionDescription": {
+    "message": "Take control of your LinkedIn feed. You decide what stays, and the posts you never asked for stop showing up.",
+    "description": "The extension's one-line description."
+  }
+}

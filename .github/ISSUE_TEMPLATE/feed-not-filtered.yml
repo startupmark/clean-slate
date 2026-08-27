@@ -1,0 +1,71 @@
+name: The feed is not being filtered
+description: "Clean Slate stopped detecting posts, usually because LinkedIn changed its markup."
+title: "Feed not filtered: "
+labels: ["detection"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This is the issue most likely to be fixed quickly.
+
+        LinkedIn ships markup changes regularly. When detection breaks, the extension shows a
+        banner saying it can't read the feed version, with a **Copy diagnostic report** button.
+        That report is the single most valuable thing you can paste here.
+
+        **The report is safe to share.** It contains structure counts and attribute *names* only,
+        never post content, author names or attribute values. You can read it before pasting.
+
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostic report
+      description: Click "Copy diagnostic report" on the banner and paste it here. If no banner appeared, say so below and paste the `[CleanSlate]` console output instead.
+      render: json
+    validations:
+      required: false
+
+  - type: dropdown
+    id: banner
+    attributes:
+      label: Did the breakage banner appear?
+      options:
+        - "Yes, it told me the feed version cannot be read"
+        - "No, posts render normally, nothing is filtered, no banner"
+        - "No, the banner appeared but posts ARE being filtered (false alarm)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: console
+    attributes:
+      label: Console output
+      description: "Open DevTools (F12), Console tab, reload the feed, and paste anything prefixed `[CleanSlate]`."
+      render: text
+    validations:
+      required: false
+
+  - type: input
+    id: detection-version
+    attributes:
+      label: Detection version
+      description: "The Clean Slate popup shows a line like `detection 2026-08-22 (en)`. Paste it. If it says `built-in`, the detection file failed to load, which is itself the bug."
+      placeholder: "detection 2026-08-22 (en)"
+    validations:
+      required: true
+
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and version
+      placeholder: "Chrome 141 on Windows 11"
+    validations:
+      required: true
+
+  - type: input
+    id: locale
+    attributes:
+      label: LinkedIn interface language
+      description: Detection keys off per-locale text patterns, so a non-English feed can break in ways an English one does not.
+      placeholder: "English (US)"
+    validations:
+      required: true

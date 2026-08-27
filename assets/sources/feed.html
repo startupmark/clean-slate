@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Clean Slate feed mockup</title>
+<!-- Source for assets/screenshot.png and assets/store-1280x800.png. Rendered by
+     `npm run shots`; open it directly to work on it.
+
+     Every post is invented. The Clean Slate surfaces are the markup content.js
+     builds, styled by the real content.css, so this stays accurate only as long
+     as it is rebuilt from content.js when that changes. A test in
+     test/publishable.test.js pins every control label here against the source
+     that renders it, because this drifted twice before anyone noticed.
+
+     Shot size and scale come from the query string, so the README image and the
+     store image share one copy of the markup:
+       ?w=1280&h=800&scale=0.82 -->
+<style>
+  /* The bundled faces, by relative path. The shipped extension uses absolute
+     chrome-extension:// URLs, which do not resolve in a plain file. */
+  @font-face { font-family: Jost; font-weight: 300 700; font-display: block;
+    src: url(../../extension/fonts/jost-latin.woff2) format("woff2"); }
+  @font-face { font-family: Newsreader; font-weight: 300 700; font-display: block;
+    src: url(../../extension/fonts/newsreader-latin.woff2) format("woff2"); }
+  @font-face { font-family: "JetBrains Mono"; font-weight: 400 700; font-display: block;
+    src: url(../../extension/fonts/jetbrains-mono-latin.woff2) format("woff2"); }
+</style>
+<link rel="stylesheet" href="../../extension/content.css">
+<style>
+  html, body { margin: 0; background: #eef2f4; font-family: var(--cs-sans); }
+  #shot { box-sizing: border-box; background: #eef2f4; overflow: hidden;
+          display: flex; align-items: center; justify-content: center; }
+  #inner { width: 1146px; transform-origin: center; }
+  /* Stand-in for LinkedIn's own post chrome. Not part of the extension. */
+  .post { margin-bottom: 20px; padding: 8px 0 0; border: 1px solid #e2e8ec;
+          border-radius: 8px; background: #fff; }
+  .post:last-child { margin-bottom: 0; }
+  .post__body { padding: 10px 26px 20px; }
+  .post__author { margin: 0 0 3px; color: #18232e; font-size: 17px; font-weight: 600; }
+  .post__meta { margin: 0 0 10px; color: #5d6d78; font-size: 15px; }
+  .post__text { margin: 0 0 14px; color: #18232e; font-size: 17px; line-height: 1.45; }
+  .post__actions { color: #5d6d78; font-size: 16px; }
+  .post--hidden, .post--digest { padding: 22px 26px; }
+</style>
+</head>
+<body>
+<div id="shot"><div id="inner">
+
+  <!-- 1. A kept post, with the toolbar the content script adds. -->
+  <div class="post">
+    <div class="cs-toolbar">
+      <button type="button" class="cs-indicator" aria-expanded="false">Strong match</button>
+      <div class="cs-toolbar__actions">
+        <button type="button" class="cs-iconbtn cs-toolbar__star" aria-label="Never miss this author">&#9733;</button>
+        <button type="button" class="cs-iconbtn">Hide</button>
+        <button type="button" class="cs-iconbtn">Mute</button>
+      </div>
+    </div>
+    <div class="post__body">
+      <p class="post__author">Ryan Caldwell</p>
+      <p class="post__meta">Staff engineer, developer tools at Harborline &middot; 1st &middot; 2h</p>
+      <p class="post__text">Spent the week replacing our bespoke CI runner with a boring off-the-shelf one. Build times dropped 40% and, more importantly, nobody has to page the platform team when a cache key goes stale.</p>
+      <p class="post__actions">Like &middot; Comment &middot; Repost &middot; Send</p>
+    </div>
+  </div>
+
+  <!-- 2. A hidden post. Five actions, including Why?. -->
+  <div class="post post--hidden">
+    <section class="cs-card" aria-label="Clean Slate hidden post">
+      <div class="cs-card__topline">
+        <span>Hidden &middot; low relevance</span>
+        <span class="cs-card__score">34/100</span>
+      </div>
+      <div class="cs-card__author">Kyle Brennan</div>
+      <p class="cs-card__summary">Most hiring processes are broken because they optimise for interview performance rather than the job. Agree?</p>
+      <p class="cs-card__reason">Muted phrase: &ldquo;agree?&rdquo;</p>
+      <div class="cs-card__actions">
+        <button type="button" class="cs-button cs-button--primary">Show post</button>
+        <button type="button" class="cs-button cs-card__why" aria-expanded="false">Why?</button>
+        <button type="button" class="cs-button">More like this</button>
+        <button type="button" class="cs-button">Less like this</button>
+        <button type="button" class="cs-button">Mute this author</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- 3. The digest summary card. -->
+  <div class="post post--digest">
+    <section class="cs-digest" aria-label="Clean Slate digest summary">
+      <div class="cs-digest__topline">Digest</div>
+      <p class="cs-digest__count">14 posts hidden in today&rsquo;s digest.</p>
+      <div class="cs-digest__actions">
+        <button type="button" class="cs-button cs-button--primary">Show them</button>
+      </div>
+    </section>
+  </div>
+
+</div></div>
+<script>
+  // Defaults render the mockup at its natural size when opened by hand.
+  const q = new URLSearchParams(location.search);
+  const shot = document.getElementById("shot");
+  const inner = document.getElementById("inner");
+  shot.style.width = (q.get("w") || 1200) + "px";
+  shot.style.height = (q.get("h") || 1000) + "px";
+  inner.style.transform = "scale(" + (q.get("scale") || 1) + ")";
+</script>
+</body>
+</html>

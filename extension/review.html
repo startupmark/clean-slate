@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Clean Slate review</title>
+    <link rel="stylesheet" href="fonts.css">
+    <link rel="stylesheet" href="options.css">
+  </head>
+  <body>
+    <main>
+      <header>
+        <svg class="page-mark" viewBox="0 0 48 48" role="img" aria-label="Clean Slate">
+          <g class="mark__bars"><rect x="9" y="13" width="5" height="11" rx="1.5"/><rect x="17" y="7" width="5" height="17" rx="1.5"/><rect x="25" y="16" width="5" height="8" rx="1.5"/><rect x="33" y="10" width="5" height="14" rx="1.5"/></g>
+          <rect class="mark__base" x="6" y="25" width="36" height="3" rx="1.5"/>
+          <g class="mark__echo"><rect x="9" y="29" width="5" height="6" rx="1.5"/><rect x="17" y="29" width="5" height="3" rx="1.5"/><rect x="25" y="29" width="5" height="10" rx="1.5"/><rect x="33" y="29" width="5" height="4" rx="1.5"/></g>
+        </svg>
+        <h1>Hidden posts</h1>
+        <p class="intro">Every post Clean Slate hid, and why. Judging one teaches the filter.</p>
+        <p class="intro"><a href="options.html">Preferences</a> · <a href="help.html">How this works</a> · <a href="privacy.html">What is stored, and where</a></p>
+      </header>
+
+      <section>
+        <div class="section-heading">
+          <h2 id="range-title">Loading…</h2>
+        </div>
+        <div class="add-row" role="group" aria-label="How far back to show">
+          <button type="button" data-range="today">Today</button>
+          <button type="button" data-range="week">7 days</button>
+          <button type="button" data-range="all">Everything</button>
+        </div>
+        <p id="scoreline" class="learned-summary" role="status"></p>
+      </section>
+
+      <section>
+        <div id="rows"></div>
+        <p id="empty" class="learned-summary" hidden></p>
+      </section>
+    </main>
+    <script src="engine.js"></script>
+    <script src="runtime.js"></script>
+    <script src="review.js"></script>
+  </body>
+</html>

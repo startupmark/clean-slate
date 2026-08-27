@@ -1,0 +1,22 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+
+# Packaging artifacts
+*.zip
+dist/
+
+# Node (if a build/test step is added later)
+node_modules/
+
+# Local tooling. Not part of the extension.
+.claude/
+
+# Extension signing key and packed builds. Chrome's "Pack extension" drops both
+# in the repo root, and commits here are broad.
+*.pem
+*.crx

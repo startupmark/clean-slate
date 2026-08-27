@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Clean Slate help</title>
+    <link rel="stylesheet" href="fonts.css">
+    <link rel="stylesheet" href="options.css">
+  </head>
+  <body>
+    <main>
+      <header>
+        <svg class="page-mark" viewBox="0 0 48 48" role="img" aria-label="Clean Slate">
+          <g class="mark__bars"><rect x="9" y="13" width="5" height="11" rx="1.5"/><rect x="17" y="7" width="5" height="17" rx="1.5"/><rect x="25" y="16" width="5" height="8" rx="1.5"/><rect x="33" y="10" width="5" height="14" rx="1.5"/></g>
+          <rect class="mark__base" x="6" y="25" width="36" height="3" rx="1.5"/>
+          <g class="mark__echo"><rect x="9" y="29" width="5" height="6" rx="1.5"/><rect x="17" y="29" width="5" height="3" rx="1.5"/><rect x="25" y="29" width="5" height="10" rx="1.5"/><rect x="33" y="29" width="5" height="4" rx="1.5"/></g>
+        </svg>
+        <h1>Help</h1>
+        <p class="intro">Clean Slate scores every post in your LinkedIn home feed against rules you set, and hides the ones that fall short. Nothing is deleted, and every decision shows its reason.</p>
+      </header>
+
+      <section>
+        <div class="section-heading"><h2>Getting started</h2></div>
+        <ul class="plain">
+          <li><strong>Set your topics.</strong> In Preferences, add specific terms you want more of. "Developer tools" beats "technology".</li>
+          <li><strong>Stay on Discover for a few days.</strong> It is the balanced setting.</li>
+          <li><strong>Use the buttons on hidden posts.</strong> They teach the filter. It stays quiet until about eight judgements.</li>
+        </ul>
+      </section>
+
+      <section>
+        <div class="section-heading"><h2>Reading modes</h2></div>
+        <ul class="plain">
+          <li><strong>Focus.</strong> Only high-confidence matches.</li>
+          <li><strong>Discover.</strong> The default. Obvious noise is hidden, borderline posts dim.</li>
+          <li><strong>Digest.</strong> Only the day's strongest posts. The rest collapse behind one card.</li>
+          <li><strong>Raw.</strong> LinkedIn untouched.</li>
+        </ul>
+        <p class="help">If your feed looks empty, check the mode. Focus and Digest are the strict ones.</p>
+      </section>
+
+      <section>
+        <div class="section-heading"><h2>Scoring</h2></div>
+        <p class="help">Every post starts at 50. A promoted post loses 100. A muted phrase costs 24. One of your topics is worth 16. A first-degree connection adds 10. A poll takes 20.</p>
+        <p class="help">Select the verdict label above any post for the exact arithmetic. On a hidden post, use <strong>Why?</strong>.</p>
+        <p class="help">What the filter learns from you moves a post by at most 18 points, so your own rules always win.</p>
+      </section>
+
+      <section>
+        <div class="section-heading"><h2>Buttons</h2></div>
+        <ul class="plain">
+          <li><strong>Show post.</strong> Reveals this one post, and counts as a small vote in favour.</li>
+          <li><strong>More like this.</strong> Teaches the filter. Changes no list.</li>
+          <li><strong>Less like this.</strong> Teaches the filter the other way. Changes no list.</li>
+          <li><strong>Never miss this author.</strong> Their posts stay visible whatever else matches. Does not fade.</li>
+          <li><strong>★</strong> does the same as Never miss, and toggles off.</li>
+          <li><strong>Hide.</strong> Hides one post without judging the author.</li>
+          <li><strong>Mute.</strong> Hides every post from that person. The only button that acts on someone rather than a post. Fades after a month unless you repeat it.</li>
+          <li><strong>Why?</strong> Opens the arithmetic without opening the post.</li>
+        </ul>
+        <p class="help">Anything that changes a people list offers an Undo for a few seconds.</p>
+        <p class="help">★, Hide and Mute sit at the top of each post. They are faint until you point at the post, and always visible on a touchscreen.</p>
+      </section>
+
+      <section>
+        <div class="section-heading"><h2>Fading</h2></div>
+        <p class="help">A mute fades to nothing over 30 days, then drops off the list. Preferences shows how long each entry has left, and lets you pin it to stop it fading.</p>
+        <p class="help">Names you type into Preferences never fade. Neither does "Never miss this author". Change the 30 days, or switch fading off, under Filter strength.</p>
+      </section>
+
+      <section>
+        <div class="section-heading"><h2>Profiles</h2></div>
+        <p class="help">A profile carries its own topics, muted phrases and Discover threshold. Your people lists, page cleanup and everything the filter has learned are shared across all of them.</p>
+      </section>
+
+      <section>
+        <div class="section-heading"><h2>Review</h2></div>
+        <p class="help">Every post it hid, with the reason. Judge each one: <strong>Good call</strong> or <strong>Shouldn't have</strong>. Both teach the filter, and the tally at the top shows how often you agreed.</p>
+        <p class="help">Switch the range to see today, the last seven days, or everything. The log keeps the 200 most recent hidden posts.</p>
+        <p class="help">If a post was hidden because you muted its author, the row offers to unmute them. Verdicts alone will not lift a mute.</p>
+      </section>
+
+      <section>
+        <div class="section-heading"><h2>Pausing</h2></div>
+        <p class="help"><strong>Pause on LinkedIn</strong> in the toolbar popup stops the filtering. The feed comes back exactly as LinkedIn sends it. <strong>Raw</strong> mode does the same but keeps your settings live. Nothing is deleted either way.</p>
+      </section>
+
+      <section>
+        <div class="section-heading"><h2>Export and import</h2></div>
+        <p class="help"><strong>Export</strong> writes your settings and everything the filter has learned to a file. <strong>Import</strong> reads one back and replaces both. Use it to move to a new machine or recover after a reinstall.</p>
+        <p class="help">The log of hidden posts stays out of the file. It holds other people's writing.</p>
+      </section>
+
+      <section>
+        <div class="section-heading"><h2>Troubleshooting</h2></div>
+        <ul class="plain">
+          <li><strong>Nothing is being filtered.</strong> Refresh the LinkedIn tab. Chrome only injects the extension on navigation.</li>
+          <li><strong>Still nothing.</strong> Open the toolbar popup. "Connected · N feed items found" means it is running. Zero items means LinkedIn changed its markup, and a banner will offer a diagnostic and a way to report it.</li>
+          <li><strong>Too much is being hidden.</strong> Try Discover, lower the threshold under Filter strength, or forget any learned word that looks wrong.</li>
+          <li><strong>Too little is being hidden.</strong> Add muted phrases, and use Hide and Mute for a few days.</li>
+          <li><strong>My feed is not in English.</strong> Clean Slate reads English feeds only for now. Scoring still runs, but the rules that read words &mdash; promoted posts, polls, engagement bait, &ldquo;likes this&rdquo; &mdash; match nothing, so more gets through. Other languages are a later pass.</li>
+          <li><strong>Where did my sidebar go?</strong> Clean Slate hides the right-hand rail and some left sidebar extras. Turn either off under Page cleanup in Preferences.</li>
+          <li><strong>It is paused and I forgot.</strong> Paused and broken look the same from the feed. The toolbar popup says which, and so does the corner of the page.</li>
+        </ul>
+      </section>
+
+      <section class="data-section">
+        <div class="section-heading"><h2>Privacy and contact</h2></div>
+        <p class="help"><a href="privacy.html">What Clean Slate stores</a></p>
+        <p class="help">Questions or problems: <a href="mailto:cs-oss@triberoi.com">cs-oss@triberoi.com</a></p>
+        <p class="help">Clean Slate is not affiliated with, endorsed by, or sponsored by LinkedIn. LinkedIn is a trademark of LinkedIn Corporation.</p>
+      </section>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "version": "2026-08-27",
+  "comment": "Everything LinkedIn-specific that can break lives here: DOM selectors and per-locale text patterns. Fixing DOM churn or adding a language should be a change to this file, not to code. Patterns are JS regex sources; all are compiled case-insensitive. On the post selector: the componentkey and role=listitem used to sit on one element and no longer do. The key is on an outer wrapper and listitem is its child, so the two are matched across that edge. The child combinator is load-bearing: comment-tool nodes inside a post carry a componentkey containing FeedType too, and only a real post wraps a listitem directly.",
+  "selectors": {
+    "post": "main div[componentkey*='FeedType']:has(> div[role='listitem'])",
+    "feedColumn": "main div[role='list']"
+  },
+  "feedPaths": ["/feed"],
+  "locales": {
+    "en": {
+      "feedPostLabel": "^feed post",
+      "socialContext": "(likes this|loves this|celebrates this|supports this|finds this (insightful|funny)|commented|reposted this|follows? this (page|hashtag)|^followed by\\b)",
+      "sponsored": "^(promoted|sponsored)( by .+)?$",
+      "modules": "\\b(people you may know|suggested for you|recommended for you|linkedin news|games|add to your feed)\\b",
+      "degree": "•\\s*(1st|2nd|3rd)",
+      "poll": "\\bsee results\\b",
+      "bait": "\\b(agree\\?|thoughts\\?|repost if|comment below|like if|follow me for|i.ll dm you)\\b",
+      "uiLine": "^(like|comment|repost|send|share|follow|connect|…?\\s?more|see more|see translation|\\d[\\d,.]*|•.*|visit my website)$"
+    }
+  }
+}

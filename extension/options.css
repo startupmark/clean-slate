@@ -1,0 +1,164 @@
+/* Preferences page. Same ramp and rules as content.css, including that --quiet
+   may not carry text. Faces come from fonts.css, linked first by options.html. */
+:root {
+  --ink:#18232e; --ink-soft:#3a4a58; --slate:#61717d; --quiet:#8b99a4;
+  --line:#d8e2e7; --hairline:#eaf0f3; --paper:#f7fafb; --surface:#ffffff;
+  --signal:#106b8e; --signal-deep:#06465f; --signal-line:#a8ccda; --signal-tint:#eaf4f8;
+  --clay:#9d443b; --clay-tint:#f7edeb;
+  --on-signal:#ffffff; --ring:rgb(16 107 142 / 26%); --chip-hover:rgb(16 107 142 / 14%);
+  --sans:Jost,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --serif:Newsreader,Georgia,"Times New Roman",serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark) {
+  :root {
+    --ink:#e6edf3; --ink-soft:#c3d0da; --slate:#9fb0bd; --quiet:#75858f;
+    --line:#33414f; --hairline:#26313c; --paper:#101821; --surface:#18222d;
+    --signal:#4db3d8; --signal-deep:#7fcbe8; --signal-line:#2f5c6e; --signal-tint:#172b36;
+    --clay:#e2726a; --clay-tint:#2b1e1c;
+    --on-signal:#0b1219; --ring:rgb(77 179 216 / 30%); --chip-hover:rgb(77 179 216 / 18%);
+  }
+}
+
+/* Tells the browser this page has a dark form. Without it Chrome keeps its own
+   LIGHT palette for everything it draws: link colours, checkboxes, range
+   sliders, the file input, the select arrow — all on a near-black background.
+   Every link on this page, help.html and privacy.html was #0000EE at 1.90:1. */
+:root { color-scheme:light dark; }
+
+/* And an explicit colour, because there was no `a` rule in this file at all.
+   The popup escaped the same bug only because .footlinks a sets one. */
+a { color:var(--signal-deep); }
+a:visited { color:var(--signal-deep); }
+a:hover { color:var(--signal); }
+a:focus-visible { outline:3px solid var(--ring); outline-offset:2px; }
+
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink); font-family:var(--sans); font-size:18px; }
+main { width:min(850px,calc(100% - 40px)); margin:0 auto; padding:68px 0 80px; }
+
+header { max-width:650px; margin-bottom:52px; }
+.eyebrow { margin:0 0 10px; color:var(--signal); font-size:11px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; }
+h1,h2 { font-family:var(--serif); font-weight:400; }
+h1 { margin:0; font-size:clamp(36px,6vw,58px); line-height:.98; letter-spacing:-.03em; }
+.intro { max-width:70ch; margin:16px 0 0; color:var(--ink-soft); font-size:19px; line-height:1.6; text-wrap:pretty; }
+
+section { padding:31px 0; border-top:1px solid var(--line); }
+.section-heading { display:grid; grid-template-columns:1fr 1fr; gap:40px; margin-bottom:18px; }
+.section-heading h2 { margin:0; font-size:25px; line-height:1.1; letter-spacing:-.02em; }
+.section-heading p:last-child { margin:0; color:var(--slate); font-size:14px; line-height:1.5; text-wrap:pretty; }
+
+/* Signal-tinted chips are things you want more of. Neutral chips are things
+   you've muted — noise never gets the accent colour. */
+.chips { display:flex; flex-wrap:wrap; gap:8px; min-height:32px; }
+.chip { display:inline-flex; align-items:center; gap:10px; padding:9px 11px 9px 16px; border:1px solid var(--signal-line); border-radius:999px; background:var(--signal-tint); color:var(--signal-deep); font-size:15px; font-weight:500; }
+.chip button { width:24px; height:24px; padding:0; border:0; border-radius:50%; background:transparent; color:inherit; cursor:pointer; font-size:17px; line-height:1; }
+.chip button:hover { background:var(--chip-hover); }
+#mutedPhrases .chip,#blockedAuthors .chip { border-color:var(--line); background:var(--paper); color:var(--slate); }
+#mutedPhrases .chip button:hover,#blockedAuthors .chip button:hover { background:var(--hairline); }
+
+.add-row { display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
+.add-row input { flex:1; min-width:0; min-height:44px; padding:0 14px; border:1px solid var(--line); border-radius:3px; background:var(--surface); color:var(--ink); font:400 16px var(--sans); }
+.add-row button,.data-actions button { min-height:44px; padding:0 18px; border:1px solid var(--line); border-radius:3px; background:var(--surface); color:var(--ink); cursor:pointer; font:500 15px var(--sans); }
+.add-row button:hover,.data-actions button:hover { border-color:var(--signal); color:var(--signal-deep); }
+/* Takes the input's geometry, not the browser's default control size. */
+.add-row select { flex:0 1 240px; min-width:0; min-height:44px; padding:0 12px; border:1px solid var(--line); border-radius:3px; background:var(--surface); color:var(--ink); font:500 16px var(--sans); }
+.add-row select:hover { border-color:var(--signal); }
+.add-row button:disabled { border-color:var(--hairline); color:var(--slate); cursor:default; opacity:.6; }
+.add-row button:disabled:hover { border-color:var(--hairline); color:var(--slate); }
+
+.range-label { display:flex; justify-content:space-between; align-items:baseline; margin:0 0 9px; font-size:16px; font-weight:500; }
+.range-label output { color:var(--signal-deep); font-family:var(--mono); font-size:15px; font-weight:500; }
+.range-label+input { width:100%; height:28px; accent-color:var(--signal); }
+/* Air above a second slider, or its label sits on the first one's thumb. */
+.range-label+input+.range-label { margin-top:20px; }
+
+.check { display:flex; gap:12px; align-items:flex-start; margin-top:16px; color:var(--ink-soft); font-size:16px; line-height:1.45; cursor:pointer; }
+.check input { width:18px; height:18px; margin-top:2px; accent-color:var(--signal); }
+
+/* Clay is rare: destructive actions only. */
+.data-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
+.data-actions .danger { border-color:var(--line); color:var(--clay); }
+.data-actions .danger:hover { border-color:var(--clay); background:var(--clay-tint); color:var(--clay); }
+
+footer { display:flex; align-items:center; justify-content:flex-end; gap:20px; margin-top:12px; padding-top:28px; border-top:1px solid var(--line); }
+#saved { color:var(--signal-deep); font-size:15px; font-weight:500; }
+.save { min-height:44px; padding:0 22px; border:1px solid var(--signal); border-radius:3px; background:var(--signal); color:var(--on-signal); cursor:pointer; font:500 16px var(--sans); }
+.save:hover { border-color:var(--signal-deep); background:var(--signal-deep); }
+
+button:focus-visible,input:focus-visible { outline:3px solid var(--ring); outline-offset:2px; }
+
+/* ---- learned model inspector ---- */
+/* Weights are mono. */
+.learned-summary { margin:0 0 16px; color:var(--ink-soft); font-size:16px; line-height:1.55; }
+.learned-cols { display:grid; grid-template-columns:1fr 1fr; gap:28px; }
+.learned-cols h3 { margin:0 0 11px; color:var(--slate); font-size:13px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; }
+.learned-cols .chip { font-family:var(--mono); font-size:14px; font-weight:400; }
+#learned-neg .chip { border-color:var(--line); background:var(--paper); color:var(--slate); }
+.learned-reset { margin-top:18px; }
+
+@media (max-width:640px) {
+  main { width:min(100% - 28px,850px); padding-top:40px; }
+  .section-heading { grid-template-columns:1fr; gap:10px; }
+  .add-row { align-items:stretch; flex-direction:column; }
+  .add-row button { min-height:38px; }
+  .learned-cols { grid-template-columns:1fr; gap:20px; }
+}
+
+/* Used by privacy.html. */
+.plain { margin:16px 0 0; padding-left:22px; color:var(--ink-soft); font-size:17px; line-height:1.65; }
+.plain li { margin-bottom:7px; }
+.plain strong { color:var(--ink); font-weight:500; }
+
+/* People chips carry where they came from and how long they have left. */
+.chip__meta { margin-left:8px; color:var(--slate); font-size:13px; }
+.chip__meta--fading { color:var(--clay); }
+
+/* ---------- review page ---------- */
+/* Same page furniture as preferences; these are the parts only it has. It was a
+   panel inside LinkedIn's DOM until v0.5.0 — see review.js for why it moved. */
+
+.review-row { padding:18px 0; border-top:1px solid var(--hairline); }
+.review-row:first-child { border-top:0; }
+/* Judged rows recede, but not by fading text: opacity:.55 took the old panel's
+   rows to 2.18:1, in the file that has a test written to prevent exactly that.
+   The left edge carries the state instead. */
+.review-row--done { padding-left:13px; border-left:3px solid var(--signal-line); }
+.review-row__meta { display:flex; align-items:baseline; justify-content:space-between; gap:12px; }
+.review-row__meta strong { font-size:18px; font-weight:500; }
+/* Mono: a number to read. */
+.review-row__score { flex:none; color:var(--slate); font-family:var(--mono); font-size:15px; }
+.review-row__reason { margin:6px 0 0; color:var(--slate); font-size:16px; line-height:1.45; }
+.review-row__snippet { margin:9px 0 0; color:var(--ink-soft); font-size:17px; line-height:1.6; }
+.review-row__verdict { margin:0; align-self:center; color:var(--signal-deep); font-size:16px; font-weight:500; }
+.review-row .add-row { margin-top:12px; }
+
+/* The selected range. aria-pressed carries it for anyone not seeing colour. */
+[data-range].primary { border-color:var(--signal); background:var(--signal); color:var(--on-signal); }
+
+/* class="help" is used twenty-five times across help, privacy and preferences
+   and had no rule anywhere, so every one of those paragraphs fell back to the
+   browser's default: full-strength ink, default size, default leading. They are
+   supporting copy and should read as it. */
+.help { max-width:70ch; margin:0 0 16px; color:var(--ink-soft); font-size:17px; line-height:1.65; }
+.help:last-child { margin-bottom:0; }
+.help strong { color:var(--ink); font-weight:500; }
+
+/* Used on all three pages to set the closing section apart — data controls on
+   preferences, contact on help and privacy — and defined nowhere until now. */
+.data-section { margin-top:8px; padding-top:28px; border-top:1px solid var(--line); }
+
+/* The mark sits top right on every page. The eyebrow line that used to occupy
+   this space said "CLEAN SLATE / HELP" above a heading that said Help. */
+header { position:relative; }
+/* Sized to sit level with the h1 rather than tuck under it, so the heading gets
+   padding to match and never runs beneath the mark. */
+header h1 { padding-right:108px; }
+/* The artwork fills about two thirds of its 48-unit viewBox, so the rendered
+   mark is smaller than the box. 88px puts the visible bars a little above the
+   cap height of the heading beside them. */
+.page-mark { position:absolute; top:-4px; right:0; width:88px; height:88px; }
+.page-mark .mark__bars { fill:var(--signal); }
+.page-mark .mark__base { fill:var(--ink); }
+.page-mark .mark__echo { fill:var(--signal); opacity:.22; }
+@media (max-width:560px) { header h1 { padding-right:74px; } .page-mark { width:62px; height:62px; } }

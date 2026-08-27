@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Clean Slate</title>
+    <link rel="stylesheet" href="fonts.css">
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main>
+      <header class="masthead">
+        <!-- The mark: four bars of signal over a baseline, with faded
+             reflections below — the feed, sorted. Inline so it inherits the
+             theme tokens instead of shipping two colour variants. -->
+        <svg class="mark" width="30" height="30" viewBox="0 0 48 48" role="img" aria-label="Clean Slate">
+          <g class="mark__bars"><rect x="9" y="13" width="5" height="11" rx="1.5"/><rect x="17" y="7" width="5" height="17" rx="1.5"/><rect x="25" y="16" width="5" height="8" rx="1.5"/><rect x="33" y="10" width="5" height="14" rx="1.5"/></g>
+          <rect class="mark__base" x="6" y="25" width="36" height="3" rx="1.5"/>
+          <g class="mark__echo"><rect x="9" y="29" width="5" height="6" rx="1.5"/><rect x="17" y="29" width="5" height="3" rx="1.5"/><rect x="25" y="29" width="5" height="10" rx="1.5"/><rect x="33" y="29" width="5" height="4" rx="1.5"/></g>
+        </svg>
+        <div><p class="eyebrow">Clean Slate</p><h1>Your feed</h1></div>
+      </header>
+      <p id="page-status" class="status">Checking this page…</p>
+
+      <!-- Order matters more than it looks. Chrome caps a popup at 600px and
+           this was 901px tall, so everything a person opens the popup TO DO —
+           review, reveal, pause, preferences — sat below a cut most of them
+           would never scroll past. Actions first, the numbers underneath.
+           Page cleanup moved to preferences, where the same three toggles
+           already lived. -->
+      <div class="group">
+        <p class="label" id="mode-label">Reading mode</p>
+        <div class="mode-group" role="group" aria-labelledby="mode-label">
+          <button data-mode="focus">Focus</button><button data-mode="discover">Discover</button><button data-mode="digest">Digest</button><button data-mode="raw">Raw</button>
+        </div>
+        <p id="mode-copy" class="help" role="status"></p>
+      </div>
+
+      <div class="actions">
+        <button id="review" class="secondary">Review hidden posts</button>
+        <button id="reveal" class="secondary">Show hidden posts on this page</button>
+        <button id="toggle" class="secondary">Pause on LinkedIn</button>
+      </div>
+
+      <button type="button" id="learned-nudge" class="nudge" hidden></button>
+
+      <div class="group">
+        <p class="label" id="profile-label">Profile</p>
+        <select id="profile" aria-labelledby="profile-label"></select>
+      </div>
+
+      <section class="counts" aria-label="What Clean Slate has done">
+        <div><strong id="checked">0</strong><span>checked</span></div>
+        <div><strong id="hidden">0</strong><span>hidden</span></div>
+        <div><strong id="dimmed">0</strong><span>dimmed</span></div>
+      </section>
+
+      <p class="footlinks"><a href="help.html" target="_blank">How this works</a> · <a href="privacy.html" target="_blank">What is stored</a></p>
+      <button id="preferences" class="preferences">Preferences <span>→</span></button>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>

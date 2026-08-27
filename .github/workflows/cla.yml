@@ -1,0 +1,62 @@
+name: CLA Assistant
+
+# Enforces the CLA in CLA.md. Self-hosted so signatures stay in this repository
+# and no third party gets write access. Signatures live on the `cla-signatures`
+# branch, not main. See the branch input below.
+#
+# SECURITY. READ BEFORE EDITING.
+# `pull_request_target` runs with a write-scoped token and triggers on forks.
+# That is safe ONLY because this job never checks out or runs the PR's code.
+# Do NOT add an `actions/checkout` of the PR head, and do NOT add a build or
+# test step here. Untrusted code belongs in test.yml, under `pull_request`.
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_target:
+    types: [opened, closed, synchronize]
+
+permissions:
+  actions: write
+  contents: write
+  pull-requests: write
+  statuses: write
+
+jobs:
+  CLAAssistant:
+    runs-on: ubuntu-latest
+    steps:
+      - name: CLA Assistant
+        # `contains`, not `==`. CONTRIBUTING.md asks for a comment *containing*
+        # this line, and quotes it as a blockquote, so a contributor who copies
+        # the line with its "> " marker, or adds a word around it, followed the
+        # documentation exactly and was skipped with no bot response.
+        if: (contains(github.event.comment.body, 'recheck') || contains(github.event.comment.body, 'I have read and agree to the Clean Slate CLA.')) || github.event_name == 'pull_request_target'
+        uses: contributor-assistant/github-action@ca4a40a7d1004f18d9960b404b97e5f30a505a08 # v2.6.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          path-to-document: 'https://github.com/startupmark/clean-slate/blob/main/CLA.md'
+          path-to-signatures: 'signatures/version1/cla.json'
+          # NOT main. The bot commits signatures with GITHUB_TOKEN, which is not
+          # exempt from branch protection. With admins enforced on main, that
+          # push is rejected and a contributor's signature is silently lost.
+          # This branch is unprotected and holds nothing else.
+          branch: 'cla-signatures'
+
+          # Must match the sentence CONTRIBUTING.md asks contributors to post, or
+          # people follow the documentation and the bot blocks them anyway.
+          custom-pr-sign-comment: 'I have read and agree to the Clean Slate CLA.'
+
+          custom-notsigned-prcomment: |
+            Thanks for the pull request. Before it can be merged, this project needs you to agree to its [Contributor License Agreement](https://github.com/startupmark/clean-slate/blob/main/CLA.md).
+
+            In plain terms: **the project is and stays GPL-3.0 for everyone.** By contributing, you additionally license your contribution to the maintainer in a way that permits offering the project under other terms, including a possible future commercial license. This is disclosed up front so you can decide with full information.
+
+            If you agree, post a new comment on this pull request containing exactly:
+
+          custom-allsigned-prcomment: 'All contributors have signed the CLA. Thank you.'
+
+          # The maintainer owns the copyright and does not sign an agreement with
+          # himself; bots have nothing to license.
+          allowlist: startupmark,dependabot[bot],github-actions[bot]

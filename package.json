@@ -1,0 +1,15 @@
+{
+  "name": "clean-slate",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Test harness for the Clean Slate browser extension. The extension ships no dependencies and needs no build step. This file exists so `npm test` works.",
+  "license": "GPL-3.0-only",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "shots": "node tools/shots.mjs",
+    "package": "node tools/package.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

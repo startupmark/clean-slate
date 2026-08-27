@@ -1,0 +1,78 @@
+name: Bug report
+description: "Something misbehaves: the UI, the popup, preferences, or a wrong verdict."
+title: "Bug: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        If the feed simply is not being filtered at all, use
+        **The feed is not being filtered** instead. That template collects the diagnostics
+        that make a detection break fixable.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you saw, and what you expected instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open the LinkedIn home feed
+        2. Click the Clean Slate toolbar button
+        3. ...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Where does it happen?
+      multiple: true
+      options:
+        - The feed itself (hiding, dimming, the per-post toolbar)
+        - The popup
+        - The preferences page
+        - The review page ("Review hidden posts")
+        - The left or right sidebar cleanup
+        - Somewhere else
+    validations:
+      required: true
+
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Which reading mode were you in?
+      options: ["Discover", "Focus", "Digest", "Raw", "Not sure"]
+    validations:
+      required: true
+
+  - type: textarea
+    id: console
+    attributes:
+      label: Console output
+      description: "DevTools (F12) → Console. Anything prefixed `[CleanSlate]`, plus any red errors."
+      render: text
+    validations:
+      required: false
+
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and version
+      placeholder: "Chrome 141 on Windows 11"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Before you post
+      options:
+        - label: I have removed any real post content, author names, or personal details from what I pasted above.
+          required: true

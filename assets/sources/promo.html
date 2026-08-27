@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Clean Slate promo tile</title>
+<!-- Source for the Chrome Web Store promo tiles. Rendered by `npm run shots`;
+     open it directly to work on it.
+
+     One tile, two sizes, chosen by the query string so the mark and the copy
+     exist once:
+       ?size=small     440x280
+       ?size=marquee   1400x560
+
+     Colours come from content.css, so the tiles follow the design system rather
+     than carrying their own copy of it. The store rejects an alpha channel, and
+     the render script writes 24-bit PNG. -->
+<style>
+  @font-face { font-family: Jost; font-weight: 300 700; font-display: block;
+    src: url(../../extension/fonts/jost-latin.woff2) format("woff2"); }
+  @font-face { font-family: Newsreader; font-weight: 300 700; font-display: block;
+    src: url(../../extension/fonts/newsreader-latin.woff2) format("woff2"); }
+</style>
+<link rel="stylesheet" href="../../extension/content.css">
+<style>
+  html, body { margin: 0; background: var(--cs-paper); font-family: var(--cs-sans); }
+  .tile { position: relative; overflow: hidden; background: var(--cs-paper); }
+  .tile__inner { position: absolute; inset: 0; display: flex; flex-direction: column;
+                 justify-content: center; }
+  /* The signal edge that every Clean Slate surface carries. */
+  .tile::before { position: absolute; top: 0; bottom: 0; left: 0;
+                  background: var(--cs-signal); content: ""; }
+
+  body.small .tile { width: 440px; height: 280px; }
+  body.small .tile::before { width: 6px; }
+  body.small .tile__inner { padding: 0 34px 0 40px; }
+  body.small .mark { width: 46px; height: 46px; margin-bottom: 16px; }
+  body.small h1 { margin: 0 0 8px; font-family: var(--cs-serif); font-size: 34px;
+                  font-weight: 400; line-height: 1; letter-spacing: -.02em; color: var(--cs-ink); }
+  body.small p { margin: 0; color: var(--cs-slate); font-size: 15px; line-height: 1.4; }
+
+  body.logo .tile { width: 300px; height: 300px; }
+  body.logo .tile::before { display: none; }
+  body.logo .tile__inner { align-items: center; }
+  body.logo .mark { width: 168px; height: 168px; margin: 0; }
+  body.logo h1, body.logo p { display: none; }
+
+  body.marquee .tile { width: 1400px; height: 560px; }
+  body.marquee .tile::before { width: 14px; }
+  body.marquee .tile__inner { padding: 0 90px 0 110px; }
+  body.marquee .mark { width: 96px; height: 96px; margin-bottom: 34px; }
+  body.marquee h1 { margin: 0 0 20px; font-family: var(--cs-serif); font-size: 82px;
+                    font-weight: 400; line-height: 1; letter-spacing: -.03em; color: var(--cs-ink); }
+  body.marquee p { margin: 0; max-width: 50ch; color: var(--cs-slate); font-size: 30px; line-height: 1.4; }
+</style>
+</head>
+<body>
+<div class="tile">
+  <div class="tile__inner">
+    <svg class="mark" viewBox="0 0 48 48" role="img" aria-label="Clean Slate">
+      <g fill="#106b8e"><rect x="9" y="13" width="5" height="11" rx="1.5"/><rect x="17" y="7" width="5" height="17" rx="1.5"/><rect x="25" y="16" width="5" height="8" rx="1.5"/><rect x="33" y="10" width="5" height="14" rx="1.5"/></g>
+      <rect x="6" y="25" width="36" height="3" rx="1.5" fill="#18232e"/>
+      <g fill="#a8ccda"><rect x="9" y="29" width="5" height="6" rx="1.5"/><rect x="17" y="29" width="5" height="3" rx="1.5"/><rect x="25" y="29" width="5" height="10" rx="1.5"/><rect x="33" y="29" width="5" height="4" rx="1.5"/></g>
+    </svg>
+    <h1>Clean Slate</h1>
+    <p>Your feed. Your rules.</p>
+  </div>
+</div>
+<script>
+  const size = new URLSearchParams(location.search).get("size");
+  document.body.className = ["marquee", "logo"].includes(size) ? size : "small";
+</script>
+</body>
+</html>

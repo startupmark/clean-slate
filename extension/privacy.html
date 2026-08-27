@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Clean Slate privacy</title>
+    <link rel="stylesheet" href="fonts.css">
+    <link rel="stylesheet" href="options.css">
+  </head>
+  <body>
+    <main>
+      <header>
+        <svg class="page-mark" viewBox="0 0 48 48" role="img" aria-label="Clean Slate">
+          <g class="mark__bars"><rect x="9" y="13" width="5" height="11" rx="1.5"/><rect x="17" y="7" width="5" height="17" rx="1.5"/><rect x="25" y="16" width="5" height="8" rx="1.5"/><rect x="33" y="10" width="5" height="14" rx="1.5"/></g>
+          <rect class="mark__base" x="6" y="25" width="36" height="3" rx="1.5"/>
+          <g class="mark__echo"><rect x="9" y="29" width="5" height="6" rx="1.5"/><rect x="17" y="29" width="5" height="3" rx="1.5"/><rect x="25" y="29" width="5" height="10" rx="1.5"/><rect x="33" y="29" width="5" height="4" rx="1.5"/></g>
+        </svg>
+        <h1>Privacy Policy</h1>
+        <p class="intro">Clean Slate has no server, no account, no analytics, and makes no network request of any kind. Everything below stays inside your browser profile, on this machine.</p>
+        <p class="help" id="last-updated">Last updated: 2026-08-26.</p>
+      </header>
+
+      <section>
+        <div class="section-heading"><h2>What is stored</h2></div>
+        <ul class="plain">
+          <li><strong>Your preferences.</strong> Topics, muted phrases, people lists, profiles, reading mode, thresholds. Used to score posts.</li>
+          <li><strong>Counters.</strong> Posts checked, hidden, dimmed. The numbers in the popup.</li>
+          <li><strong>A word model</strong> trained on your feedback. Capped at 4,000 words per side, remembering the last 400 posts by id.</li>
+          <li><strong>A log of hidden posts.</strong> The author's name, the score, the reason, and up to 600 characters of the post's text. Capped at the 200 most recent, about 190KB.</li>
+        </ul>
+        <p class="help">That last one holds other people's writing. Delete it any time in Preferences.</p>
+      </section>
+
+      <section>
+        <div class="section-heading"><h2>What is not stored</h2></div>
+        <ul class="plain">
+          <li>The text of posts that were not hidden.</li>
+          <li>Your LinkedIn credentials or session.</li>
+          <li>Anything from a page other than the LinkedIn home feed.</li>
+          <li>Any identifier for you.</li>
+        </ul>
+        <p class="help">Judging a post you kept, by starring it or pressing "More like this", adds that post's words to the learned model. That is a count per word, not the post. You can see the list, and clear it, in Preferences.</p>
+      </section>
+
+      <section>
+        <div class="section-heading"><h2>The breakage report</h2></div>
+        <p class="help">When Clean Slate cannot read the feed, it offers a one-click diagnostic to attach to a bug report. That report carries structure counts and HTML attribute <em>names</em> only. Never post content, never author names, never attribute values. It is copied to your clipboard, and you can read it before you paste it.</p>
+      </section>
+
+      <section>
+        <div class="section-heading"><h2>Permissions</h2></div>
+        <ul class="plain">
+          <li><strong>storage.</strong> To keep the above on this machine.</li>
+          <li><strong>www.linkedin.com.</strong> The only site it runs on. It reads the text of the feed page you are already looking at, in your own session, and changes how that page is shown to you.</li>
+        </ul>
+        <p class="help">There is no <code>tabs</code> permission, and no access to your browsing history, other sites, or any other tab.</p>
+      </section>
+
+      <section class="data-section">
+        <div class="section-heading"><h2>Deleting everything</h2></div>
+        <p class="help">Preferences, under <strong>Your data</strong>, has <strong>Delete all Clean Slate data</strong>. That removes the preferences, the counters, the learned model, and the log of hidden posts. Uninstalling the extension deletes the same storage.</p>
+        <p class="help">To clear only what it learned, use <strong>Forget everything learned</strong>. That also clears the log of hidden posts.</p>
+        <p class="help">Questions: <a href="mailto:cs-oss@triberoi.com">cs-oss@triberoi.com</a></p>
+      </section>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,43 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      # v5: v4 targets Node 20, which GitHub deprecated and now force-runs on
+      # Node 24 with a warning on every run.
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.0.0
+
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: '20'
+
+      # No install step: the repo has no dependencies. A lockfile appearing is
+      # the signal to revisit the dependency-free promise, not to add one.
+      # Every channel a dependency could arrive through, not just the two most
+      # obvious ones. A lockfile of any flavour, a vendored file under
+      # extension/, or an optionalDependencies block all count.
+      - name: Assert the repo is still dependency-free
+        run: |
+          for f in package-lock.json npm-shrinkwrap.json yarn.lock pnpm-lock.yaml bun.lockb; do
+            if [ -f "$f" ]; then
+              echo "$f appeared. See the dependency policy in CONTRIBUTING.md."
+              exit 1
+            fi
+          done
+          if [ -d node_modules ] || [ -d vendor ] || [ -d extension/vendor ] || [ -d extension/lib ]; then
+            echo "A vendored dependency directory appeared. See CONTRIBUTING.md."
+            exit 1
+          fi
+          node -e "const p=require('./package.json');for(const k of ['dependencies','devDependencies','optionalDependencies','peerDependencies','bundledDependencies','bundleDependencies']){if(p[k]&&Object.keys(p[k]).length){console.error('package.json declares '+k);process.exit(1)}}"
+
+      - name: Run tests
+        run: npm test
