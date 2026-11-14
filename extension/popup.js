@@ -128,7 +128,13 @@ async function initialise() {
           // away: telling whether detection.json loaded or the built-in
           // fallback is live is the whole point of it.
           : `Connected · ${found}.`)
-        : "Connected, but this LinkedIn view is not supported yet.";
+        : response?.unrecognisedView
+          // The home feed at an address the extension does not know looks
+          // exactly like a page it skips on purpose, and that sentence alone
+          // told nobody anything was wrong. The banner on the page carries the
+          // report; this line has two clamped lines, and a longer one was cut.
+          ? "Connected, but this feed's address is new to Clean Slate, so nothing is filtered."
+          : "Connected, but this LinkedIn view is not supported yet.";
       $("#page-status").title = response?.strategy ? `Scored via ${response.strategy}.` : "";
     } catch (_) {
       $("#page-status").textContent = "Reload this LinkedIn page to start Clean Slate.";

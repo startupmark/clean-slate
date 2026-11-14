@@ -4,7 +4,7 @@ Clean Slate updates by hand: you download a zip, replace the folder, and press r
 
 Watch this repository (Watch → Custom → Releases) to hear about a new one.
 
-## 0.1.1 — 2026-11-13
+## 0.1.1 — 2026-11-14
 
 **Update if** Clean Slate stopped hiding posts and the popup says "Connected, but this LinkedIn view is not supported yet." That is everyone on 0.1.0.
 

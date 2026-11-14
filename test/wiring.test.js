@@ -130,6 +130,22 @@ test("the content script handles every message that drives its UI", () => {
     "the review page is being injected into LinkedIn's DOM again");
 });
 
+test("an unknown feed view reaches the banner and the popup", () => {
+  // When the home feed moved to /feed/foryou/, the only word from the extension
+  // was a popup line saying the view was not supported. Each link below is one
+  // place that chain can quietly break again.
+  const content = read("content.js");
+  assert.match(content, /unknownFeedView:\s*onUnknownFeedView\(\)/, "the health check is not told about unknown views");
+  assert.match(content, /verdict === "unrecognised"[^\n]*showBreakageBanner\(verdict\)/,
+    "an unrecognised verdict no longer raises the banner");
+  assert.match(content, /unrecognisedView:\s*onUnknownFeedView\(\)/, "the ping no longer reports an unknown view");
+  assert.match(content, /pathSince = \{[^}]*\};\s*dismissPanel\("\.cs-breakage"\)/,
+    "the banner follows the user to the next page again");
+  assert.match(content, /function processAll\(\) \{\s*notePathChange\(\);/,
+    "a page change waits up to ten seconds for the health check to clear the banner again");
+  assert.match(read("popup.js"), /response\?\.unrecognisedView/, "the popup ignores an unknown view");
+});
+
 test("reveal-all puts the feed back itself", () => {
   // The bug this pins down: "Reveal hidden posts" called resetAll() and stopped.
   // resetAll() strips every card, toolbar and verdict label off the feed, and

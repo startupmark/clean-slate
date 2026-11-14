@@ -34,6 +34,7 @@ test("the built-in fallback matches detection.json exactly", () => {
 
   assert.deepEqual(shipped.selectors, builtIn.selectors);
   assert.deepEqual(shipped.feedPaths, builtIn.feedPaths);
+  assert.deepEqual(shipped.otherFeedPaths, builtIn.otherFeedPaths);
   assert.deepEqual(Object.keys(shipped.locales).sort(), Object.keys(builtIn.locales).sort());
   for (const code of Object.keys(shipped.locales)) {
     assert.deepEqual(shipped.locales[code], builtIn.locales[code], `locale "${code}" drifted`);

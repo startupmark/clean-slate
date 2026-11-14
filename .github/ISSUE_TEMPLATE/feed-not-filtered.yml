@@ -9,7 +9,8 @@ body:
         This is the issue most likely to be fixed quickly.
 
         LinkedIn ships markup changes regularly. When detection breaks, the extension shows a
-        banner saying it can't read the feed version, with a **Copy diagnostic report** button.
+        banner saying it can't read the feed version, or that the feed is at an address it doesn't
+        recognise, with a **Copy diagnostic report** button.
         That report is the single most valuable thing you can paste here.
 
         **The report is safe to share.** It contains structure counts and attribute *names* only,

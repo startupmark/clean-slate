@@ -135,7 +135,10 @@ test("the diagnostic report carries no page path and no attribute values", () =>
   const fn = source.slice(source.indexOf("function buildDiagnostics"));
   const body = fn.slice(0, fn.indexOf("\n  }"));
 
-  assert.ok(!/location\.pathname/.test(body), "the diagnostic report is emitting the page path again");
+  // The one sanctioned route is feedViewName, which passes a plain view name
+  // and nothing else; its own tests cover what it lets through.
+  assert.ok(!/location\.pathname/.test(body.replace(/feedViewName\(location\.pathname\)/g, "")),
+    "the diagnostic report is emitting the page path again");
   assert.ok(/attr\.name/.test(body), "the diagnostic no longer collects attribute names");
   assert.ok(!/attr\.value/.test(body), "the diagnostic is collecting attribute VALUES");
   assert.ok(!/innerText/.test(body.replace(/mainTextLength[\s\S]{0,80}?length/, "")),

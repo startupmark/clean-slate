@@ -14,6 +14,7 @@ var CleanSlateEngine = (() => {
       feedColumn: "main div[role='list']"
     },
     feedPaths: ["/feed", "/feed/foryou"],
+    otherFeedPaths: ["/feed/following", "/feed/hashtag", "/feed/update", "/feed/news"],
     locales: {
       en: {
         feedPostLabel: "^feed post",
@@ -96,6 +97,7 @@ var CleanSlateEngine = (() => {
       post: selector(raw.selectors.post, DETECTION_DEFAULTS.selectors.post),
       feedColumn: selector(raw.selectors.feedColumn, DETECTION_DEFAULTS.selectors.feedColumn),
       feedPaths: raw.feedPaths,
+      otherFeedPaths: Array.isArray(raw.otherFeedPaths) ? raw.otherFeedPaths : DETECTION_DEFAULTS.otherFeedPaths,
       feedPostLabel: rx(loc.feedPostLabel),
       socialContext: rx(loc.socialContext),
       sponsored: rx(loc.sponsored),

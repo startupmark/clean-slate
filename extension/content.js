@@ -25,7 +25,7 @@
   // asserted by regex over its own source.
   const {
     MAX_DECISIONS, HEALTH_GRACE_MS,
-    emptyModel, matchesFeedPath, mergeSettings, bumpStats, stampAuthor, unstampAuthor,
+    emptyModel, matchesFeedPath, feedView, feedViewName, mergeSettings, bumpStats, stampAuthor, unstampAuthor,
     trainModel, untrainModel, hideReason, hiddenLogEntry, appendHidden, planDecisionPrune,
     toolbarLabel, breakdownText, isPriorityAuthor: isPriorityIn,
     healthVerdict, isDismissKey, diagnosticsPayload
@@ -179,6 +179,7 @@
   // them and was eligible to write them to the hidden-post log — while PRIVACY.md says
   // nothing is stored away from the home feed. Confirmed on a real permalink.
   const onFeedPage = () => matchesFeedPath(location.pathname, det.feedPaths);
+  const onUnknownFeedView = () => feedView(location.pathname, det.feedPaths, det.otherFeedPaths) === "unknown";
 
   function findPostNodes() {
     return [...document.querySelectorAll(det.post)];
@@ -788,6 +789,7 @@
   // ---------- processing loop ----------
 
   function processAll() {
+    notePathChange();
     if (!settings) return;
 
     if (!onFeedPage()) {
@@ -911,6 +913,7 @@
       detectionLocale: det.locale,
       locale: document.documentElement.lang || navigator.language,
       readyState: document.readyState,
+      feedView: onUnknownFeedView() ? feedViewName(location.pathname) : undefined,
       mainTextLength: document.querySelector("main")?.innerText.length ?? 0,
       selectorHits: {
         postSelector: count(det.post),
@@ -927,8 +930,25 @@
     });
   }
 
-  function showBreakageBanner() {
+  // Two reasons nothing is being filtered, with one banner and one report. The
+  // copy differs because the cause does: on the home feed the markup stopped
+  // matching; on an unknown view the posts match fine and the address does not.
+  const BANNER_COPY = {
+    broken: {
+      heading: "Can't read this feed version.",
+      body: "LinkedIn has probably changed its markup, so nothing is being filtered. " +
+        "Copy the diagnostic report, then open the report form and paste it in. It carries page structure only, no post content."
+    },
+    unrecognised: {
+      heading: "This feed is at an address Clean Slate doesn't recognise.",
+      body: "Posts are showing, but Clean Slate only filters the home feed at addresses it knows, so nothing here is being filtered. " +
+        "If this is your home feed, copy the diagnostic report and send it in. It carries page structure and the name of this feed view, no post content."
+    }
+  };
+
+  function showBreakageBanner(kind = "broken") {
     if (document.querySelector(".cs-breakage")) return;
+    const copy = BANNER_COPY[kind];
     let dismissBanner = () => {};
     const el = document.createElement("aside");
     el.className = "cs-breakage";
@@ -938,10 +958,9 @@
     eyebrow.className = "cs-welcome__eyebrow";
     eyebrow.textContent = "Clean Slate";
     const heading = document.createElement("h2");
-    heading.textContent = "Can't read this feed version.";
+    heading.textContent = copy.heading;
     const body = document.createElement("p");
-    body.textContent = "LinkedIn has probably changed its markup, so nothing is being filtered. " +
-      "Copy the diagnostic report, then open the report form and paste it in. It carries page structure only, no post content.";
+    body.textContent = copy.body;
 
     const actions = document.createElement("div");
     actions.className = "cs-welcome__actions";
@@ -987,15 +1006,24 @@
     log("breakage banner shown; diagnostics:", buildDiagnostics().selectorHits);
   }
 
+  // The banner describes the page it was raised on. LinkedIn navigates without
+  // a reload, so without this it followed the user to /jobs. Called from
+  // processAll as well as the health check: the check runs every ten seconds,
+  // and a banner lingering that long on the next page read as never leaving.
+  function notePathChange() {
+    if (location.pathname === pathSince.path) return false;
+    pathSince = { path: location.pathname, t: Date.now() };
+    dismissPanel(".cs-breakage");
+    return true;
+  }
+
   function healthCheck() {
-    if (location.pathname !== pathSince.path) {
-      pathSince = { path: location.pathname, t: Date.now() };
-      return;
-    }
+    if (notePathChange()) return;
     if (!settings) return;
 
     const verdict = healthVerdict({
       onFeed: onFeedPage(),
+      unknownFeedView: onUnknownFeedView(),
       enabled: settings.enabled,
       mode: settings.mode,
       postCount: findPostNodes().length,
@@ -1006,7 +1034,7 @@
     });
 
     if (verdict === "healthy") dismissPanel(".cs-breakage");
-    if (verdict === "broken") showBreakageBanner();
+    if (verdict === "broken" || verdict === "unrecognised") showBreakageBanner(verdict);
   }
 
   // ---------- onboarding ----------
@@ -1078,6 +1106,7 @@
       sendResponse({
         running: true,
         supported: onFeedPage(),
+        unrecognisedView: onUnknownFeedView() && findPostNodes().length > 0,
         feedItems: findPostNodes().length,
         strategy: `detection ${det.version} (${det.locale})`,
         // compileDetection records the fall back to English as "de→en". Only
