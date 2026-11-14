@@ -93,15 +93,18 @@ test("the feed gate matches the home feed exactly, not everything beneath it", (
   // A prefix match also admitted these, where posts were scored, decorated and
   // eligible for the hidden-post log — against a policy saying nothing is stored away
   // from the home feed. Confirmed live on a real permalink before the fix.
-  const paths = ["/feed"];
+  // Reads the shipped list: a hardcoded copy here stayed green while LinkedIn
+  // moved the home feed to /feed/foryou/ and the extension stopped running.
+  const paths = JSON.parse(fs.readFileSync(path.join(EXTENSION_DIR, "detection.json"), "utf8")).feedPaths;
   const admits = (pathname) => runtime.matchesFeedPath(pathname, paths);
 
-  for (const home of ["/feed", "/feed/"]) {
+  for (const home of ["/feed", "/feed/", "/feed/foryou", "/feed/foryou/"]) {
     assert.ok(admits(home), `the home feed itself is no longer matched: ${home}`);
   }
   for (const elsewhere of [
     "/feed/hashtag/leadership/",
     "/feed/following/",
+    "/feed/foryou/extra/",
     "/feed/news/",
     "/feed/update/urn:li:activity:7498081285039501312/",
     "/messaging/thread/123/",

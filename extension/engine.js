@@ -13,7 +13,7 @@ var CleanSlateEngine = (() => {
       post: "main div[componentkey*='FeedType']:has(> div[role='listitem'])",
       feedColumn: "main div[role='list']"
     },
-    feedPaths: ["/feed"],
+    feedPaths: ["/feed", "/feed/foryou"],
     locales: {
       en: {
         feedPostLabel: "^feed post",
