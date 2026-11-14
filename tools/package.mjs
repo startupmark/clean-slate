@@ -5,7 +5,7 @@
 // everything in clean-slate/. Handing someone the wrong one fails in a way that
 // looks like the extension is broken.
 //
-// Uses PowerShell's Compress-Archive on Windows and zip elsewhere, so there is
+// Uses the tar.exe that ships with Windows and zip elsewhere, so there is
 // no dependency. Run with `npm run package`.
 
 import { execFileSync } from "node:child_process";
@@ -65,21 +65,48 @@ for (const item of SHIP_ROOT) {
   fs.cpSync(path.join(ROOT, item), path.join(wrapped, item));
 }
 
+// Windows uses the bsdtar that ships in System32, not Compress-Archive: Windows
+// PowerShell 5.1 writes entry names with backslashes, which unzip on macOS and
+// Linux as flat files named "clean-slate\background.js" rather than a folder.
+// The full path matters because a Git Bash PATH puts GNU tar first, and GNU tar
+// cannot write a zip.
+const winTar = path.join(process.env.SystemRoot || "C:\\Windows", "System32", "tar.exe");
+
 const zip = (from, to) => {
   fs.rmSync(to, { force: true });
   if (os.platform() === "win32") {
-    execFileSync("powershell", ["-NoProfile", "-Command",
-      `Compress-Archive -Path '${from}\\*' -DestinationPath '${to}' -CompressionLevel Optimal`],
-      { stdio: "pipe" });
+    execFileSync(winTar, ["-a", "-cf", to, ...fs.readdirSync(from)], { cwd: from, stdio: "pipe" });
   } else {
     execFileSync("zip", ["-qr", to, "."], { cwd: from, stdio: "pipe" });
   }
+};
+
+// The zip format requires forward slashes. Checked on the built file, so a tool
+// that gets it wrong fails the build instead of shipping. Names are read from the
+// central directory rather than through a lister, because Windows tar -tf
+// rewrites backslashes to slashes and reports a broken zip as clean.
+const entries = (file) => {
+  const buf = fs.readFileSync(file);
+  const eocd = buf.lastIndexOf(Buffer.from([0x50, 0x4b, 0x05, 0x06]));
+  if (eocd < 0) throw new Error(`${path.basename(file)} is not a zip`);
+  const names = [];
+  for (let at = buf.readUInt32LE(eocd + 16), n = buf.readUInt16LE(eocd + 10); n > 0; n--) {
+    const nameLength = buf.readUInt16LE(at + 28);
+    names.push(buf.toString("utf8", at + 46, at + 46 + nameLength));
+    at += 46 + nameLength + buf.readUInt16LE(at + 30) + buf.readUInt16LE(at + 32);
+  }
+  return names;
+};
+const assertPortable = (file) => {
+  const bad = entries(file).filter((name) => name.includes("\\"));
+  if (bad.length) throw new Error(`${path.basename(file)} has backslash entry names: ${bad.slice(0, 3).join(", ")}`);
 };
 
 const store = path.join(OUT, `clean-slate-${version}-store.zip`);
 const unpacked = path.join(OUT, `clean-slate-${version}.zip`);
 zip(flat, store);                       // manifest.json at the root, for the stores
 zip(path.join(stage, "wrapped"), unpacked); // wrapped in clean-slate/, for Load unpacked
+for (const file of [store, unpacked]) assertPortable(file);
 
 fs.rmSync(stage, { recursive: true, force: true });
 
