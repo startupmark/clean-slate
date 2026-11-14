@@ -1,11 +1,11 @@
 {
-  "version": "2026-08-27",
-  "comment": "Everything LinkedIn-specific that can break lives here: DOM selectors and per-locale text patterns. Fixing DOM churn or adding a language should be a change to this file, not to code. Patterns are JS regex sources; all are compiled case-insensitive. On the post selector: the componentkey and role=listitem used to sit on one element and no longer do. The key is on an outer wrapper and listitem is its child, so the two are matched across that edge. The child combinator is load-bearing: comment-tool nodes inside a post carry a componentkey containing FeedType too, and only a real post wraps a listitem directly.",
+  "version": "2026-11-13",
+  "comment": "Everything LinkedIn-specific that can break lives here: DOM selectors and per-locale text patterns. Fixing DOM churn or adding a language should be a change to this file, not to code. Patterns are JS regex sources; all are compiled case-insensitive. On the post selector: the componentkey and role=listitem used to sit on one element and no longer do. The key is on an outer wrapper and listitem is its child, so the two are matched across that edge. The child combinator is load-bearing: comment-tool nodes inside a post carry a componentkey containing FeedType too, and only a real post wraps a listitem directly. On feedPaths: LinkedIn now redirects /feed/ to /feed/foryou/, the same home feed under a new path; /feed stays for anyone not yet redirected.",
   "selectors": {
     "post": "main div[componentkey*='FeedType']:has(> div[role='listitem'])",
     "feedColumn": "main div[role='list']"
   },
-  "feedPaths": ["/feed"],
+  "feedPaths": ["/feed", "/feed/foryou"],
   "locales": {
     "en": {
       "feedPostLabel": "^feed post",
