@@ -4,6 +4,14 @@ Clean Slate updates by hand: you download a zip, replace the folder, and press r
 
 Watch this repository (Watch → Custom → Releases) to hear about a new one.
 
+## 0.1.1 — 2026-11-13
+
+**Update if** Clean Slate stopped hiding posts and the popup says "Connected, but this LinkedIn view is not supported yet." That is everyone on 0.1.0.
+
+### Fixed
+
+- **Works on the home feed again.** LinkedIn moved the home feed from `/feed/` to `/feed/foryou/`, and Clean Slate only ran on the old address. It now runs on both. Other feeds under `/feed/`, such as Following, hashtags and single posts, are still left alone.
+
 ## 0.1.0 — 2026-08-27
 
 The first release.
