@@ -4,7 +4,7 @@
 account, no analytics and no network request of any kind. Everything below
 happens inside your browser profile.
 
-Last updated: 2026-08-26.
+Last updated: 2026-11-14.
 
 ## What is stored, and where
 
@@ -38,6 +38,8 @@ have judged. You can see the whole list, and clear it, in Preferences.
 When Clean Slate cannot read the feed, it offers a one-click diagnostic to attach
 to a bug report. That report contains structure counts and HTML attribute
 *names* only, never post content, never author names, never attribute values.
+When the feed is at an address Clean Slate does not recognise, it also carries
+the name of that feed view, such as `foryou`, and never the rest of the address.
 Nothing is sent anywhere. It is copied to your clipboard for you to paste, and
 you can read it before you do.
 

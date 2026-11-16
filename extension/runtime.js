@@ -32,6 +32,33 @@ var CleanSlateRuntime = (() => {
     return (feedPaths || []).some((path) => trimSlashes(path) === here);
   }
 
+  // Where a page sits relative to the home feed. "home" is filtered; "elsewhere"
+  // is a feed view left alone on purpose (hashtags, permalinks, Following);
+  // "unknown" is under /feed/ but on neither list, which is how the home feed
+  // moving to /feed/foryou/ looked: posts on screen, nothing filtered, no word
+  // from the extension. Known views match as a prefix at a segment boundary, so
+  // /feed/hashtag covers every tag and /feed/update every permalink.
+  function feedView(pathname, feedPaths, otherFeedPaths) {
+    const here = trimSlashes(pathname);
+    if (matchesFeedPath(here, feedPaths)) return "home";
+    if (!here.startsWith("/feed/")) return "off";
+    const elsewhere = (otherFeedPaths || []).some((path) => {
+      const base = trimSlashes(path);
+      return Boolean(base) && (here === base || here.startsWith(base + "/"));
+    });
+    return elsewhere ? "elsewhere" : "unknown";
+  }
+
+  // The one piece of the address the diagnostic report may carry, and only for
+  // an unknown view: the segment after /feed/, if it reads as a word. A view
+  // name like "foryou" is what a maintainer needs to fix this; anything that
+  // could identify a post or a person (an urn, digits, an encoded value) is
+  // replaced rather than sent.
+  function feedViewName(pathname) {
+    const segment = trimSlashes(pathname).split("/")[2] || "";
+    return /^[a-z][a-z-]{0,30}$/.test(segment) ? segment : "(not a plain word)";
+  }
+
   // ---------- settings ----------
 
   // The two nested objects have to be merged a level down or a stored settings
@@ -257,11 +284,20 @@ var CleanSlateRuntime = (() => {
   // text on it. Loosening either turns a bad connection into a false alarm.
   function healthVerdict(state) {
     const {
-      onFeed, enabled, mode, postCount, mainTextLength,
+      onFeed, unknownFeedView = false, enabled, mode, postCount, mainTextLength,
       pathSettledFor, now, snoozedUntil, graceMs = HEALTH_GRACE_MS
     } = state;
 
-    if (!onFeed || !enabled || mode === "raw") return "idle";
+    if (!enabled || mode === "raw") return "idle";
+    // Off the home feed the check is normally silent. The exception is a feed
+    // view on no list that is showing posts: that is most likely the home feed
+    // at a new address, and every user on it is unfiltered until a release.
+    if (!onFeed) {
+      if (!unknownFeedView || postCount === 0) return "idle";
+      if (pathSettledFor <= graceMs) return "waiting";
+      if (now <= snoozedUntil) return "snoozed";
+      return "unrecognised";
+    }
     if (postCount > 0) return "healthy";
     if (pathSettledFor <= graceMs) return "waiting";
     if (mainTextLength <= 2000) return "waiting";
@@ -276,7 +312,8 @@ var CleanSlateRuntime = (() => {
   // ---------- the diagnostic report ----------
 
   // Structure only. No page path — on a permalink that is urn:li:activity:<id>,
-  // a resolvable post identifier — no attribute values, and no page text beyond
+  // a resolvable post identifier — beyond the view name feedViewName allows for
+  // an unknown feed view, no attribute values, and no page text beyond
   // its length. The banner tells the user this is page structure only as they
   // paste it into a public issue.
   function diagnosticsPayload(input) {
@@ -287,6 +324,7 @@ var CleanSlateRuntime = (() => {
       locale: input.locale,
       readyState: input.readyState,
       mainTextLength: input.mainTextLength,
+      ...(input.feedView ? { feedView: input.feedView } : {}),
       selectorHits: { ...input.selectorHits },
       attributeNamesSeen: [...input.attributeNames].sort().slice(0, 80),
       state: { ...input.state }
@@ -303,6 +341,8 @@ var CleanSlateRuntime = (() => {
     HEALTH_GRACE_MS,
     emptyModel,
     matchesFeedPath,
+    feedView,
+    feedViewName,
     mergeSettings,
     mergeStoredStats,
     bumpStat,

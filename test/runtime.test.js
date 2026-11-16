@@ -371,6 +371,71 @@ test("the check stays quiet where the extension is not working", () => {
   assert.equal(health({ mode: "raw" }), "idle");
 });
 
+// ---------- the home feed at an address nobody listed ----------
+
+const shippedDetection = JSON.parse(require("node:fs").readFileSync(
+  require("node:path").join(__dirname, "..", "extension", "detection.json"), "utf8"));
+const viewOf = (p) => runtime.feedView(p, shippedDetection.feedPaths, shippedDetection.otherFeedPaths);
+
+test("every page is home, a known feed view, unknown, or off the feed", () => {
+  assert.equal(viewOf("/feed/"), "home");
+  assert.equal(viewOf("/feed/foryou/"), "home");
+  // Left alone on purpose, every one of them showing posts the selector matches.
+  for (const p of ["/feed/following/", "/feed/hashtag/leadership/", "/feed/news/",
+    "/feed/update/urn:li:activity:7498081285039501312/"]) {
+    assert.equal(viewOf(p), "elsewhere", p);
+  }
+  // How /feed/foryou/ looked before it was listed.
+  assert.equal(viewOf("/feed/recommended/"), "unknown");
+  assert.equal(viewOf("/feed/foryou/extra/"), "unknown", "a home path is not a prefix for its children");
+  // A known view matches at a segment boundary, not as a string prefix.
+  assert.equal(viewOf("/feed/hashtags/"), "unknown");
+  assert.equal(viewOf("/feed/updates/"), "unknown");
+  for (const p of ["/jobs/", "/feedback", "/feeds", "/in/someone/", "", undefined]) {
+    assert.equal(viewOf(p), "off", String(p));
+  }
+});
+
+test("an empty or missing list of known views does not match everything", () => {
+  assert.equal(runtime.feedView("/feed/hashtag/x/", ["/feed"], []), "unknown");
+  assert.equal(runtime.feedView("/feed/hashtag/x/", ["/feed"], undefined), "unknown");
+  assert.equal(runtime.feedView("/feed/hashtag/x/", ["/feed"], ["", "/"]), "unknown",
+    "a blank entry would have admitted every path under the feed");
+});
+
+test("the report names an unknown view only when the name is a plain word", () => {
+  assert.equal(runtime.feedViewName("/feed/foryou/"), "foryou");
+  assert.equal(runtime.feedViewName("/feed/top-stories"), "top-stories");
+  for (const p of ["/feed/urn:li:activity:7498081285039501312/", "/feed/7498081285039501312/",
+    "/feed/ACoAAB12xyz/", "/feed/%E2%9C%93/", "/feed/", "/feed/" + "a".repeat(40)]) {
+    assert.equal(runtime.feedViewName(p), "(not a plain word)", p);
+  }
+});
+
+test("an unknown feed view showing posts raises the banner once settled", () => {
+  const unknown = (over) => health({ onFeed: false, unknownFeedView: true, postCount: 8, ...over });
+  assert.equal(unknown(), "unrecognised");
+  assert.equal(unknown({ pathSettledFor: runtime.HEALTH_GRACE_MS }), "waiting", "the grace period applies");
+  assert.equal(unknown({ snoozedUntil: 200000 }), "snoozed", "a snooze applies");
+  // Nothing on screen is no evidence of anything, and a short page is fine.
+  assert.equal(unknown({ postCount: 0 }), "idle");
+  assert.equal(unknown({ mainTextLength: 0 }), "unrecognised");
+  assert.equal(unknown({ enabled: false }), "idle");
+  assert.equal(unknown({ mode: "raw" }), "idle");
+  // Known views stay silent however many posts they show.
+  assert.equal(health({ onFeed: false, unknownFeedView: false, postCount: 8 }), "idle");
+});
+
+test("the report carries the view name only when it is given one", () => {
+  const base = {
+    version: "0.1.1", when: "", detectionVersion: "v", detectionLocale: "en", locale: "en",
+    readyState: "complete", mainTextLength: 0, selectorHits: {}, attributeNames: new Set(), state: {}
+  };
+  assert.equal(runtime.diagnosticsPayload({ ...base, feedView: "foryou" }).feedView, "foryou");
+  assert.ok(!("feedView" in runtime.diagnosticsPayload(base)), "an empty feedView key reached a home-feed report");
+  assert.ok(!("feedView" in runtime.diagnosticsPayload({ ...base, feedView: undefined })));
+});
+
 // ---------- panels ----------
 
 test("Escape closes a panel, and nothing else does", () => {
