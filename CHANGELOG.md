@@ -4,6 +4,19 @@ Clean Slate updates by hand: you download a zip, replace the folder, and press r
 
 Watch this repository (Watch → Custom → Releases) to hear about a new one.
 
+## 0.1.2 — 2026-11-15
+
+**Update if** you want Clean Slate to tell you the next time your feed moves to an address it doesn't know. Nothing is broken on 0.1.1 today; if you are still on 0.1.0, update, because 0.1.0 no longer works on the home feed.
+
+### Added
+
+- **A banner when your feed is at an address Clean Slate doesn't recognise.** When the home feed moved to `/feed/foryou/`, Clean Slate stopped filtering and said only that the view was not supported. Now, if a page under `/feed/` shows posts but is on neither the home-feed list nor the list of feeds left alone on purpose, a banner says nothing is being filtered and offers the diagnostic report. The popup says the same.
+- **The report names the feed view** in that case, such as `foryou`, and only if it is a plain word. Nothing else from the address is included. The privacy policy says so.
+
+### Fixed
+
+- **The breakage banner clears when you leave the page.** It used to follow you to the next page for up to ten seconds.
+
 ## 0.1.1 — 2026-11-14
 
 **Update if** Clean Slate stopped hiding posts and the popup says "Connected, but this LinkedIn view is not supported yet." That is everyone on 0.1.0.
