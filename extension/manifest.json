@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Clean Slate",
   "short_name": "Clean Slate",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Take control of your LinkedIn feed. You decide what stays, and the posts you never asked for stop showing up.",
   "default_locale": "en",
   "permissions": ["storage"],
