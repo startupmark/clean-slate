@@ -4,6 +4,12 @@ Clean Slate updates by hand: you download a zip, replace the folder, and press r
 
 Watch this repository (Watch → Custom → Releases) to hear about a new one.
 
+## 1.0.0 — 2026-11-16
+
+**Update if** you'd rather install from the Chrome Web Store or Edge Add-ons. If you're on 0.1.2, you don't need this release: it changes nothing in how Clean Slate works.
+
+The version jumps to 1.0.0 because the Chrome Web Store already holds an earlier build numbered 0.5.0 and only accepts a higher number.
+
 ## 0.1.2 — 2026-11-15
 
 **Update if** you want Clean Slate to tell you the next time your feed moves to an address it doesn't know. Nothing is broken on 0.1.1 today; if you are still on 0.1.0, update, because 0.1.0 no longer works on the home feed.
