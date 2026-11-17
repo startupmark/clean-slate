@@ -309,6 +309,63 @@ var CleanSlateRuntime = (() => {
 
   const isDismissKey = (key) => key === "Escape";
 
+  // ---------- what the feed says about itself ----------
+
+  const MODE_NAMES = { focus: "Focus", discover: "Discover", digest: "Digest", raw: "Raw" };
+
+  // The popup was the only place that said which mode and profile were on, so
+  // a feed that looked thin gave no clue that Focus was the reason.
+  function profileName(settings) {
+    const found = settings.activeProfile
+      && (settings.profiles || []).find((profile) => profile.id === settings.activeProfile);
+    return found ? found.name : "Default";
+  }
+
+  function statusMarkLabel(settings) {
+    if (!settings.enabled) return "Paused";
+    if (settings.mode === "raw") return "Raw mode";
+    return `${MODE_NAMES[settings.mode] || MODE_NAMES.discover} · ${profileName(settings)} profile`;
+  }
+
+  // Below this many posts the feed is still loading, and a notice that comes
+  // and goes as the first posts arrive is worse than none.
+  const EMPTY_FEED_MIN = 5;
+
+  // Every post on screen hidden and none brought back. entries: [{ outcome, revealed }].
+  function feedAllHidden(entries) {
+    return entries.length >= EMPTY_FEED_MIN
+      && entries.every((entry) => entry.outcome === "hide" && !entry.revealed);
+  }
+
+  // What to say when it is, and which looser mode to offer.
+  function emptyFeedNotice(mode, count) {
+    const name = MODE_NAMES[mode] || MODE_NAMES.discover;
+    const looser = mode === "focus" || mode === "digest" ? "discover" : null;
+    return {
+      text: mode === "digest"
+        ? `All ${count} posts so far are below today's digest bar. Your topics may be too narrow.`
+        : `${name} mode hid all ${count} posts so far. Your topics may be too narrow.`,
+      switchTo: looser,
+      switchLabel: looser ? `Switch to ${MODE_NAMES[looser]}` : null
+    };
+  }
+
+  // ---------- keyboard shortcuts ----------
+
+  // LinkedIn's top bar sits over the first ~52px of the viewport.
+  const HEADER_PX = 52;
+
+  // Which post a shortcut acts on: the focused one if it qualifies, otherwise
+  // the first in feed order that is on screen below the top bar.
+  // candidates: [{ top, bottom, hidden, focused }] in DOM order.
+  function shortcutTarget(candidates, want, viewportHeight) {
+    const fits = (c) => c.hidden === (want === "hidden");
+    const onScreen = (c) => c.bottom > HEADER_PX && c.top < viewportHeight && c.bottom > c.top;
+    const focused = candidates.findIndex((c) => c.focused && fits(c));
+    if (focused > -1) return focused;
+    return candidates.findIndex((c) => fits(c) && onScreen(c));
+  }
+
   // ---------- the diagnostic report ----------
 
   // Structure only. No page path — on a permalink that is urn:li:activity:<id>,
@@ -362,6 +419,13 @@ var CleanSlateRuntime = (() => {
     isPriorityAuthor,
     healthVerdict,
     isDismissKey,
+    MODE_NAMES,
+    profileName,
+    statusMarkLabel,
+    EMPTY_FEED_MIN,
+    feedAllHidden,
+    emptyFeedNotice,
+    shortcutTarget,
     diagnosticsPayload
   };
 })();

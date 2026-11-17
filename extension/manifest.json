@@ -20,6 +20,11 @@
   },
   "background": { "service_worker": "background.js" },
   "options_page": "options.html",
+  "commands": {
+    "hide-post": { "suggested_key": { "default": "Alt+Shift+H" }, "description": "Hide the post at the top of the screen" },
+    "show-post": { "suggested_key": { "default": "Alt+Shift+S" }, "description": "Show the hidden post at the top of the screen" },
+    "open-review": { "suggested_key": { "default": "Alt+Shift+R" }, "description": "Open the review page" }
+  },
   "web_accessible_resources": [{
     "resources": ["detection.json", "fonts/*.woff2"],
     "matches": ["https://www.linkedin.com/*"]

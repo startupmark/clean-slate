@@ -726,10 +726,74 @@ test("the feed says which of its two silent states it is in", () => {
   // Paused and broken look identical from the feed: nothing is filtered either
   // way, and help.html tells people to diagnose a break.
   const source = read("content.js");
-  assert.match(source, /function showPausedMark/, "there is no paused indicator");
-  assert.match(source, /showPausedMark\(settings\.enabled \? "Raw mode" : "Paused"\)/,
-    "the indicator does not distinguish Raw mode from paused");
-  assert.ok(read("content.css").includes(".cs-paused"), "the paused indicator is unstyled");
+  // runtime.test.js covers what it says; this covers that it is shown.
+  assert.match(source, /function showStatusMark/, "there is no status mark");
+  const loop = source.slice(source.indexOf("function processAll"), source.indexOf("function pruneDecisions"));
+  assert.equal((loop.match(/showStatusMark\(statusMarkLabel\(settings\)\)/g) || []).length, 2,
+    "the mark is not shown both while filtering and while paused or raw");
+  assert.match(loop, /"\.cs-status"\)\?\.remove\(\)/, "the mark follows you off the feed");
+  assert.ok(read("content.css").includes(".cs-status {"), "the status mark is unstyled");
+});
+
+test("an empty feed is explained, and Digest explains it on its own card", () => {
+  const source = read("content.js");
+  const loop = source.slice(source.indexOf("function processAll"), source.indexOf("function pruneDecisions"));
+  assert.match(loop, /applyEmptyNotice\(nodes\)/, "the empty-feed check never runs");
+  const fn = source.slice(source.indexOf("function applyEmptyNotice"));
+  assert.match(fn.slice(0, 400), /settings\.mode !== "digest"/, "Digest gets two notices");
+  assert.match(source, /\.cs-digest__loosen"\)\.hidden = !empty/, "the digest card never shows its way out");
+  // The notice lives inside a hidden post, whose other children CSS hides.
+  assert.match(read("content.css"), /\.cs-hidden-post > \*:not\(\.cs-card\):not\(\.cs-digest\):not\(\.cs-empty\)/,
+    "the notice is hidden by the rule that hides the post it sits in");
+  assert.match(source, /:scope > \.cs-empty"\)/, "Raw mode leaves the notice behind");
+});
+
+test("each keyboard shortcut is declared, forwarded and handled", () => {
+  const manifest = JSON.parse(read("manifest.json"));
+  const commands = Object.keys(manifest.commands || {}).sort();
+  assert.deepEqual(commands, ["hide-post", "open-review", "show-post"]);
+  // Chrome assigns at most four suggested keys, and each must be unique.
+  const keys = commands.map((c) => manifest.commands[c].suggested_key?.default);
+  assert.equal(new Set(keys).size, keys.length, "two commands share a key");
+  for (const c of commands) assert.ok(manifest.commands[c].description, `${c} has no description`);
+
+  const background = read("background.js");
+  assert.match(background, /chrome\.commands\.onCommand\.addListener/, "nothing listens for the shortcuts");
+  for (const c of commands) assert.ok(background.includes(`"${c}"`), `${c} is declared but never handled`);
+  assert.match(background, /type: "clean-slate:shortcut"/);
+
+  const content = read("content.js");
+  assert.match(content, /message\.type === "clean-slate:shortcut"/, "the feed ignores forwarded shortcuts");
+  assert.match(content, /runShortcut\(message\.action\)/);
+
+  // Every key the onboarding and help name is a key the manifest declares.
+  for (const file of ["content.js", "help.html"]) {
+    for (const key of read(file).match(/Alt\+Shift\+[A-Z]/g) || []) {
+      assert.ok(keys.includes(key), `${file} names ${key}, which no command uses`);
+    }
+  }
+});
+
+test("onboarding walks through modes and the learner, and every step can finish", () => {
+  const source = read("content.js");
+  const fn = source.slice(source.indexOf("function showWelcome"), source.indexOf("// ---------- keyboard shortcuts"));
+  for (let step = 0; step < 3; step++) assert.match(fn, new RegExp(`step === ${step}`), `step ${step + 1} is missing`);
+  // Step two sets the mode for real.
+  assert.match(fn, /saveSettings\(\{ mode \}\)/, "picking a mode on step two does nothing");
+  for (const mode of ["focus", "discover", "digest", "raw"]) assert.ok(fn.includes(`${mode}:`), `${mode} is not offered`);
+  // The last step ends it, and so does the close button.
+  assert.match(fn, /makeButton\("Done", "cs-button--primary", dismiss\)/, "the last step cannot finish");
+  assert.match(fn, /closeButton\.addEventListener\("click", dismiss\)/);
+  assert.match(fn, /onboardingComplete: true/);
+});
+
+test("the non-English notice fits the popup's two lines", () => {
+  // Measured in headless Chrome at 320px with Jost: about 75 characters plus the
+  // language name fit. The first version needed four lines and lost its second half.
+  const line = read("popup.js").match(/\? `(English only[^`]*)`/);
+  assert.ok(line, "the non-English notice moved or changed shape");
+  const fixed = line[1].replace(/\$\{[^}]*\}/g, "");
+  assert.ok(fixed.length <= 75, `the notice is ${fixed.length} characters before the language name`);
 });
 
 test("a runaway people list can be emptied without deleting everything", () => {
