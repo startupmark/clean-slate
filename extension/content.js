@@ -28,7 +28,8 @@
     emptyModel, matchesFeedPath, feedView, feedViewName, mergeSettings, bumpStats, stampAuthor, unstampAuthor,
     trainModel, untrainModel, hideReason, hiddenLogEntry, appendHidden, planDecisionPrune,
     toolbarLabel, breakdownText, isPriorityAuthor: isPriorityIn,
-    healthVerdict, isDismissKey, diagnosticsPayload
+    healthVerdict, isDismissKey, diagnosticsPayload,
+    MODE_NAMES, statusMarkLabel, feedAllHidden, emptyFeedNotice, shortcutTarget
   } = CleanSlateRuntime;
 
   const docLang = () => document.documentElement.lang || navigator.language || "en";
@@ -354,20 +355,23 @@
 
     const actions = document.createElement("div");
     actions.className = "cs-toast__actions";
-    actions.append(
-      makeButton("Undo", "cs-button--primary", async () => {
+    // No revert means a plain notice: nothing to take back, only to dismiss.
+    if (revert) {
+      actions.append(makeButton("Undo", "cs-button--primary", async () => {
         clearTimeout(timer);
         toast.remove();
         await revert();
         processAll();
-      }),
-      makeButton("Dismiss", "", () => { clearTimeout(timer); toast.remove(); })
-    );
+      }));
+    }
+    actions.append(makeButton("Dismiss", "", () => { clearTimeout(timer); toast.remove(); }));
 
     toast.append(text, actions);
     document.body.append(toast);
     const timer = setTimeout(() => toast.remove(), UNDO_MS);
   }
+
+  const showNotice = (message) => offerUndo(message, null);
 
   // ---------- floating panels ----------
   // Each of these covers the page at the top of the stacking order. Without a
@@ -499,8 +503,78 @@
       processAll();
     }));
 
-    card.append(topline, count, actions);
+    // Only when the digest has nothing in it: the way out of an empty feed.
+    const loosen = document.createElement("div");
+    loosen.className = "cs-digest__loosen";
+    // The digest card already leads with Show them, so the way out stays secondary.
+    loosen.append(...emptyFeedActions(emptyFeedNotice("digest", 0), { showAll: false, primary: false }));
+
+    card.append(topline, count, actions, loosen);
     return card;
+  }
+
+  // ---------- an empty feed ----------
+  // A mode that hides every post left a wall of cards, or in Digest a single
+  // summary, with nothing saying why or how to loosen it.
+
+  function emptyFeedActions(notice, { showAll, primary = true }) {
+    const buttons = [];
+    if (notice.switchTo) {
+      buttons.push(makeButton(notice.switchLabel, primary ? "cs-button--primary" : "", () => saveSettings({ mode: notice.switchTo })));
+    }
+    buttons.push(makeButton("Edit topics", "", () => chrome.runtime.sendMessage({ type: "clean-slate:open-options" })));
+    if (showAll) {
+      buttons.push(makeButton("Show them", "", () => {
+        resetAll({ keepRevealed: true });
+        processAll();
+      }));
+    }
+    return buttons;
+  }
+
+  function buildEmptyNotice(notice) {
+    const panel = document.createElement("section");
+    panel.className = "cs-empty";
+    panel.setAttribute("aria-label", "Clean Slate: every post is hidden");
+
+    const heading = document.createElement("p");
+    heading.className = "cs-empty__heading";
+    heading.textContent = "Every post so far is hidden";
+
+    const text = document.createElement("p");
+    text.className = "cs-empty__text";
+    text.textContent = notice.text;
+
+    const actions = document.createElement("div");
+    actions.className = "cs-empty__actions";
+    actions.append(...emptyFeedActions(notice, { showAll: true }));
+
+    panel.append(heading, text, actions);
+    return panel;
+  }
+
+  const verdicts = (nodes) => nodes
+    .map((node) => decisions.get(postKeyOf(node)))
+    .filter(Boolean);
+
+  const allHidden = (entries) =>
+    feedAllHidden(entries.map((entry) => ({ outcome: entry.result.outcome, revealed: entry.revealed })));
+
+  // Digest has its own summary card and says it there.
+  function applyEmptyNotice(nodes) {
+    const entries = verdicts(nodes);
+    const empty = settings.mode !== "digest" && allHidden(entries);
+    const host = empty ? nodes.find((node) => decisions.has(postKeyOf(node))) : null;
+
+    for (const panel of document.querySelectorAll(".cs-empty")) {
+      if (panel.parentElement !== host) panel.remove();
+    }
+    if (!host) return;
+
+    const notice = emptyFeedNotice(settings.mode, entries.length);
+    const existing = host.querySelector(":scope > .cs-empty");
+    if (existing) existing.querySelector(".cs-empty__text").textContent = notice.text;
+    else host.prepend(buildEmptyNotice(notice));
   }
 
   function applyDigest(nodes) {
@@ -530,8 +604,11 @@
 
     const existing = host.querySelector(":scope > .cs-digest");
     const card = existing || buildDigestCard();
-    card.querySelector(".cs-digest__count").textContent =
-      `${hidden} post${hidden === 1 ? "" : "s"} hidden in today's digest.`;
+    const empty = allHidden(verdicts(nodes));
+    card.querySelector(".cs-digest__count").textContent = empty
+      ? emptyFeedNotice("digest", hidden).text
+      : `${hidden} post${hidden === 1 ? "" : "s"} hidden in today's digest.`;
+    card.querySelector(".cs-digest__loosen").hidden = !empty;
     if (!existing) host.prepend(card);
   }
 
@@ -774,12 +851,14 @@
   // A paused extension and a broken one look identical from the feed: nothing is
   // filtered either way. help.html tells people to diagnose a break, and the
   // first thing it has to rule out is the switch they flipped and forgot. Small,
-  // fixed, and out of the way — it is a status, not a notice.
-  function showPausedMark(label) {
-    let mark = document.querySelector(".cs-paused");
+  // fixed, and out of the way — it is a status, not a notice. It also names the
+  // mode and profile, which used to be visible only in the popup, so a thin
+  // feed in Focus said nothing about why it was thin.
+  function showStatusMark(label) {
+    let mark = document.querySelector(".cs-status");
     if (!mark) {
       mark = document.createElement("div");
-      mark.className = "cs-paused";
+      mark.className = "cs-status";
       mark.setAttribute("role", "status");
       document.body.append(mark);
     }
@@ -798,6 +877,7 @@
       // below this return — so leaving the feed froze the Map holding up to 600
       // detached post subtrees until the next visit.
       pruneDecisions([]);
+      document.querySelector(".cs-status")?.remove();
       return;
     }
 
@@ -806,10 +886,10 @@
 
     if (settings.mode === "raw" || !settings.enabled) {
       nodes.forEach((node) => stripDecoration(node));
-      showPausedMark(settings.enabled ? "Raw mode" : "Paused");
+      showStatusMark(statusMarkLabel(settings));
       return;
     }
-    document.querySelector(".cs-paused")?.remove();
+    showStatusMark(statusMarkLabel(settings));
 
     // Reads first, then writes. Interleaving them forced a full-document layout
     // per new post — innerText needs layout, and decorating the previous post
@@ -847,6 +927,7 @@
 
     // After every post has a verdict: the summary counts what it hid.
     applyDigest(nodes);
+    applyEmptyNotice(nodes);
     pruneDecisions(nodes);
   }
 
@@ -869,7 +950,7 @@
     node.classList.remove("cs-hidden-post", "cs-dimmed", "cs-collapsed");
     // Raw mode says the feed exactly as it was, so the tooltip goes too.
     if (node.title && node.title.startsWith("Clean Slate:")) node.removeAttribute("title");
-    node.querySelectorAll(":scope > .cs-card, :scope > .cs-toolbar, :scope > .cs-digest")
+    node.querySelectorAll(":scope > .cs-card, :scope > .cs-toolbar, :scope > .cs-digest, :scope > .cs-empty")
       .forEach((el) => el.remove());
   }
 
@@ -1040,6 +1121,12 @@
   // ---------- onboarding ----------
 
   // Once per install. Every exit path marks onboarding complete.
+  //
+  // Three short steps. It used to be one banner, so reading modes, profiles and
+  // the learner were never introduced, and a new user met the toolbar's Hide
+  // and Mute with no idea that each click teaches the filter.
+  const WELCOME_STEPS = 3;
+
   function showWelcome() {
     // Feed only. The card is consumed once per install, so mounting it on
     // /jobs, /messaging, a profile or a permalink spent the single introduction
@@ -1049,6 +1136,7 @@
     if (settings.onboardingComplete || document.querySelector(".cs-welcome")) return;
     const el = document.createElement("aside");
     el.className = "cs-welcome";
+    el.setAttribute("aria-label", "Welcome to Clean Slate");
 
     let close = () => el.remove();
     const dismiss = async () => {
@@ -1064,39 +1152,131 @@
     closeButton.textContent = "✕";
     closeButton.addEventListener("click", dismiss);
 
-    const eyebrow = document.createElement("div");
-    eyebrow.className = "cs-welcome__eyebrow";
-    eyebrow.textContent = "Clean Slate";
-    const heading = document.createElement("h2");
-    heading.textContent = "You decide what stays in your feed.";
-    const body = document.createElement("p");
-    body.textContent = "We only change what you see on this page. " +
-      "Click the Clean Slate button in your browser toolbar to change settings.";
+    const content = document.createElement("div");
+    el.append(closeButton, content);
 
-    // Two things this never said, both of which a new user notices in the first
-    // minute. The sidebars vanish immediately and nothing anywhere mentioned it,
-    // and "Use defaults" adopted four topics belonging to somebody else without
-    // naming one of them.
-    const defaults = document.createElement("p");
-    defaults.className = "cs-welcome__defaults";
-    defaults.textContent =
-      "The right-hand rail and some left sidebar extras are hidden. " +
-      `Starting topics are ${DEFAULTS.interests.slice(0, -1).join(", ")} and ${DEFAULTS.interests.at(-1)}. ` +
-      "Change all of this in Preferences.";
+    const paragraph = (text, className) => {
+      const p = document.createElement("p");
+      if (className) p.className = className;
+      p.textContent = text;
+      return p;
+    };
 
-    const actions = document.createElement("div");
-    actions.className = "cs-welcome__actions";
-    actions.append(
-      makeButton("Set my interests", "cs-button--primary", () => {
-        dismiss();
-        chrome.runtime.sendMessage({ type: "clean-slate:open-options" });
-      }),
-      makeButton("Start with those", "", dismiss)
-    );
+    function showStep(step) {
+      const eyebrow = paragraph(`Clean Slate · ${step + 1} of ${WELCOME_STEPS}`, "cs-welcome__eyebrow");
+      const heading = document.createElement("h2");
+      const actions = document.createElement("div");
+      actions.className = "cs-welcome__actions";
+      const next = makeButton("Next", step === 0 ? "" : "cs-button--primary", () => showStep(step + 1));
+      const parts = [];
 
-    el.append(closeButton, eyebrow, heading, body, defaults, actions);
+      if (step === 0) {
+        heading.textContent = "You decide what stays in your feed.";
+        parts.push(paragraph("We only change what you see on this page. " +
+          "Click the Clean Slate button in your browser toolbar to change settings."));
+
+        // Two things this never said, both of which a new user notices in the
+        // first minute. The sidebars vanish immediately and nothing anywhere
+        // mentioned it, and "Use defaults" adopted four topics belonging to
+        // somebody else without naming one of them.
+        const defaults = document.createElement("p");
+        defaults.className = "cs-welcome__defaults";
+        defaults.textContent =
+          "The right-hand rail and some left sidebar extras are hidden. " +
+          `Starting topics are ${DEFAULTS.interests.slice(0, -1).join(", ")} and ${DEFAULTS.interests.at(-1)}. ` +
+          "Change all of this in Preferences.";
+        parts.push(defaults);
+
+        actions.append(
+          makeButton("Set my interests", "cs-button--primary", () => {
+            dismiss();
+            chrome.runtime.sendMessage({ type: "clean-slate:open-options" });
+          }),
+          next
+        );
+      }
+
+      if (step === 1) {
+        heading.textContent = "Pick how strict it is.";
+        parts.push(paragraph("You can change this any time from the toolbar button."));
+        const modes = document.createElement("div");
+        modes.className = "cs-welcome__modes";
+        modes.setAttribute("role", "group");
+        modes.setAttribute("aria-label", "Reading mode");
+        const MODE_LINES = {
+          focus: "Only close matches to your topics.",
+          discover: "Removes the obvious noise. The default.",
+          digest: "The day's best posts, the rest behind one card.",
+          raw: "The feed exactly as it is."
+        };
+        for (const mode of ["focus", "discover", "digest", "raw"]) {
+          const choice = makeButton("", "cs-welcome__mode", async () => {
+            await saveSettings({ mode });
+            modes.querySelectorAll(".cs-welcome__mode").forEach((button) => {
+              button.setAttribute("aria-pressed", String(button === choice));
+            });
+          });
+          const name = document.createElement("strong");
+          name.textContent = MODE_NAMES[mode];
+          const line = document.createElement("span");
+          line.textContent = MODE_LINES[mode];
+          choice.append(name, line);
+          choice.setAttribute("aria-pressed", String(settings.mode === mode));
+          modes.append(choice);
+        }
+        parts.push(modes);
+        actions.append(next);
+      }
+
+      if (step === 2) {
+        heading.textContent = "It learns from what you do.";
+        parts.push(
+          paragraph("Each post you keep gets a small bar. Hide removes that post, Mute hides everything " +
+            "its author writes, and the star means you never miss them. A hidden post leaves a card " +
+            "with the reason and a Show post button. Every click teaches the filter."),
+          paragraph("Profiles keep separate sets of topics, one for work and one for hiring, say. " +
+            "Switch between them from the toolbar button."),
+          paragraph("Shortcuts: Alt+Shift+H hides the post at the top of the screen, Alt+Shift+S shows " +
+            "a hidden one, and Alt+Shift+R opens the review page.", "cs-welcome__defaults")
+        );
+        actions.append(makeButton("Done", "cs-button--primary", dismiss));
+      }
+
+      content.replaceChildren(eyebrow, heading, ...parts, actions);
+      el.focus({ preventScroll: true });
+    }
+
+    showStep(0);
     document.body.append(el);
     close = makeDismissible(el);
+  }
+
+  // ---------- keyboard shortcuts ----------
+  // Declared as commands in the manifest, so the browser owns the keys and the
+  // user can rebind them. The service worker forwards them here.
+  function runShortcut(action) {
+    if (!settings || !onFeedPage() || !settings.enabled || settings.mode === "raw") return;
+    const candidates = [];
+    const entries = [];
+    for (const node of findPostNodes()) {
+      const entry = decisions.get(postKeyOf(node));
+      if (!entry) continue;
+      const box = node.getBoundingClientRect();
+      candidates.push({
+        top: box.top,
+        bottom: box.bottom,
+        hidden: entry.result.outcome === "hide" && !entry.revealed,
+        focused: node.contains(document.activeElement)
+      });
+      entries.push(entry);
+    }
+    const index = shortcutTarget(candidates, action === "show" ? "hidden" : "kept", window.innerHeight);
+    if (index < 0) {
+      showNotice(action === "show" ? "There is no hidden post on screen to show." : "There is no post on screen to hide.");
+      return;
+    }
+    if (action === "show") reveal(entries[index]);
+    else hideNow(entries[index]);
   }
 
   // ---------- messaging ----------
@@ -1115,6 +1295,10 @@
         localeFallback: det.locale.includes("→") ? det.locale.split("→")[0] : null,
         mode: settings?.mode || "discover"
       });
+      return;
+    }
+    if (message.type === "clean-slate:shortcut") {
+      runShortcut(message.action);
       return;
     }
     if (message.type === "clean-slate:refresh") {

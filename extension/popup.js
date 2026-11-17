@@ -121,7 +121,10 @@ async function initialise() {
           // match nothing, and the extension looked simply worse rather than
           // limited. It knew all along; it said so as "de→en" in a diagnostic
           // string. Say it in a sentence instead.
-          ? `Connected · ${found}. This feed is in ${languageName(response.localeFallback)}, and Clean Slate reads English feeds only, so promoted posts and some signals will slip through.`
+          // Two clamped lines at 320px. The first version needed four, and the
+          // half that mattered was the half cut. Measured in headless Chrome
+          // with "Norwegian Bokmål" and "Chinesisch (traditionell)".
+          ? `English only for now, so on this ${languageName(response.localeFallback)} feed promoted posts slip through.`
           // The detection version and locale used to sit in this sentence. It
           // is a diagnostic, and it wrapped the box to a second line in a popup
           // Chrome caps at 600px. It moves to the title below rather than going

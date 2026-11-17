@@ -527,3 +527,92 @@ test("counting nothing changes nothing", () => {
   assert.equal(coerced.checked, 15, `a numeric string produced ${JSON.stringify(coerced.checked)}`);
   assert.equal(typeof coerced.checked, "number", "a counter stopped being a number");
 });
+
+// ---------- what the feed says about itself (#5) ----------
+
+test("the status mark names the mode and the profile", () => {
+  const base = { enabled: true, mode: "focus", activeProfile: null, profiles: [] };
+  assert.equal(runtime.statusMarkLabel(base), "Focus · Default profile");
+
+  const hiring = { ...base, mode: "digest", activeProfile: "p2",
+    profiles: [{ id: "p1", name: "Work" }, { id: "p2", name: "Hiring" }] };
+  assert.equal(runtime.statusMarkLabel(hiring), "Digest · Hiring profile");
+
+  // A profile id that no longer exists reads as Default, which is what scoring falls back to.
+  assert.equal(runtime.statusMarkLabel({ ...base, activeProfile: "gone" }), "Focus · Default profile");
+});
+
+test("the status mark still says paused and raw before anything else", () => {
+  const base = { enabled: true, mode: "discover", activeProfile: null, profiles: [] };
+  assert.equal(runtime.statusMarkLabel({ ...base, enabled: false }), "Paused");
+  assert.equal(runtime.statusMarkLabel({ ...base, enabled: false, mode: "raw" }), "Paused");
+  assert.equal(runtime.statusMarkLabel({ ...base, mode: "raw" }), "Raw mode");
+});
+
+// ---------- an empty feed (#6) ----------
+
+test("the feed counts as empty only when every post is hidden and none brought back", () => {
+  assert.ok(runtime.EMPTY_FEED_MIN >= 3 && runtime.EMPTY_FEED_MIN <= 10);
+  const hide = { outcome: "hide", revealed: false };
+  const enough = Array(runtime.EMPTY_FEED_MIN).fill(hide);
+  assert.equal(runtime.feedAllHidden(enough), true);
+
+  // Still loading: too few posts to say anything.
+  assert.equal(runtime.feedAllHidden(enough.slice(1)), false);
+  // One kept, dimmed or revealed post means the feed is not empty.
+  assert.equal(runtime.feedAllHidden([...enough, { outcome: "keep", revealed: false }]), false);
+  assert.equal(runtime.feedAllHidden([...enough, { outcome: "dim", revealed: false }]), false);
+  assert.equal(runtime.feedAllHidden([...enough.slice(1), { outcome: "hide", revealed: true }]), false);
+});
+
+test("an empty feed offers a looser mode only when there is one", () => {
+  const focus = runtime.emptyFeedNotice("focus", 12);
+  assert.equal(focus.switchTo, "discover");
+  assert.equal(focus.switchLabel, "Switch to Discover");
+  assert.match(focus.text, /12/);
+  assert.match(focus.text, /Focus/);
+
+  const digest = runtime.emptyFeedNotice("digest", 9);
+  assert.equal(digest.switchTo, "discover");
+  assert.match(digest.text, /9 posts/);
+
+  const discover = runtime.emptyFeedNotice("discover", 7);
+  assert.equal(discover.switchTo, null, "Discover offered to switch to itself");
+  assert.equal(discover.switchLabel, null);
+});
+
+// ---------- keyboard shortcuts (#7) ----------
+
+test("a shortcut acts on the first post on screen of the kind it wants", () => {
+  const posts = [
+    { top: -600, bottom: -10, hidden: false, focused: false }, // scrolled past
+    { top: 20, bottom: 50, hidden: false, focused: false },    // under the top bar
+    { top: 60, bottom: 300, hidden: true, focused: false },
+    { top: 310, bottom: 700, hidden: false, focused: false },
+    { top: 900, bottom: 1300, hidden: true, focused: false }   // below the fold
+  ];
+  assert.equal(runtime.shortcutTarget(posts, "kept", 800), 3);
+  assert.equal(runtime.shortcutTarget(posts, "hidden", 800), 2);
+  assert.equal(runtime.shortcutTarget(posts.slice(3), "hidden", 800), -1, "a post below the fold was chosen");
+});
+
+test("a focused post wins, but only if it is the right kind", () => {
+  const posts = [
+    { top: 60, bottom: 300, hidden: false, focused: false },
+    { top: 310, bottom: 700, hidden: false, focused: true }
+  ];
+  assert.equal(runtime.shortcutTarget(posts, "kept", 800), 1);
+  // Asking to show a hidden post while a kept one has focus finds nothing.
+  assert.equal(runtime.shortcutTarget(posts, "hidden", 800), -1);
+});
+
+test("a collapsed post is never a shortcut target", () => {
+  // Digest collapses hidden posts to nothing. A zero-height box at the top of
+  // the screen is still on screen by its coordinates.
+  const posts = [
+    { top: 100, bottom: 100, hidden: true, focused: false },
+    { top: 120, bottom: 400, hidden: true, focused: false }
+  ];
+  assert.equal(runtime.shortcutTarget(posts, "hidden", 800), 1);
+  assert.equal(runtime.shortcutTarget([], "kept", 800), -1);
+});

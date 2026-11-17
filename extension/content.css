@@ -52,7 +52,7 @@ body[data-color-scheme="dark"] {
 
 /* Hiding a post drops its own children; the injected card stays visible. Never
    remove or reparent LinkedIn's nodes — React owns them. */
-.cs-hidden-post > *:not(.cs-card):not(.cs-digest) { display:none !important; }
+.cs-hidden-post > *:not(.cs-card):not(.cs-digest):not(.cs-empty) { display:none !important; }
 .cs-collapsed { display:none !important; }
 .cs-rail-hidden,.cs-box-hidden { display:none !important; }
 /* A "maybe" is signalled by draining colour, never by fading text. Opacity
@@ -83,6 +83,16 @@ body[data-color-scheme="dark"] {
 /* Counts are Newsreader, as in the popup. */
 .cs-digest__count { margin:9px 0 0; color:var(--cs-ink); font-family:var(--cs-serif); font-size:21px; font-weight:400; line-height:1.25; letter-spacing:-.01em; }
 .cs-digest__actions { display:flex; flex-wrap:wrap; gap:7px; margin-top:13px; }
+/* Only when the digest is empty. [hidden] loses to any display rule, so it is restated. */
+.cs-digest__loosen { display:flex; flex-wrap:wrap; gap:7px; margin-top:7px; }
+.cs-digest__loosen[hidden] { display:none; }
+
+/* ---------- every post hidden ---------- */
+/* Sits above the first hidden card. Same object as the digest summary. */
+.cs-empty { box-sizing:border-box; margin:8px 0 12px; padding:15px 17px; border:1px solid var(--cs-line); border-left:3px solid var(--cs-signal); border-radius:4px; background:var(--cs-paper); color:var(--cs-ink); font-family:var(--cs-sans); box-shadow:0 2px 8px var(--cs-shadow-sm); }
+.cs-empty__heading { margin:0; color:var(--cs-ink); font-family:var(--cs-serif); font-size:21px; font-weight:400; line-height:1.25; letter-spacing:-.01em; }
+.cs-empty__text { margin:6px 0 0; color:var(--cs-slate); font-size:14px; line-height:1.45; }
+.cs-empty__actions { display:flex; flex-wrap:wrap; gap:7px; margin-top:13px; }
 
 /* ---------- controls ---------- */
 
@@ -142,6 +152,13 @@ div[role='listitem']:hover .cs-toolbar__actions,.cs-toolbar__actions:focus-withi
 .cs-welcome__defaults { margin-top:9px !important; padding-top:9px; border-top:1px solid var(--cs-hairline); font-size:13.5px !important; }
 .cs-welcome__actions { display:flex; gap:8px; margin-top:16px; }
 .cs-welcome .cs-button { min-height:32px; padding:0 13px; font-size:13px; }
+.cs-welcome p + p { margin-top:8px; }
+/* Step two: the four modes as choices, the active one in signal. */
+.cs-welcome__modes { display:flex; flex-direction:column; gap:6px; margin-top:12px; }
+.cs-welcome .cs-welcome__mode { display:flex; flex-direction:column; align-items:flex-start; gap:2px; min-height:0; padding:8px 11px; text-align:left; }
+.cs-welcome__mode strong { color:var(--cs-ink); font-size:13.5px; font-weight:600; }
+.cs-welcome__mode span { color:var(--cs-slate); font-size:13px; font-weight:400; }
+.cs-welcome__mode[aria-pressed='true'] { border-color:var(--cs-signal); background:var(--cs-signal-tint); }
 
 /* The one surface that earns clay. */
 .cs-breakage { padding:18px 20px; border-top:4px solid var(--cs-clay); }
@@ -170,6 +187,8 @@ div[role='listitem']:hover .cs-toolbar__actions,.cs-toolbar__actions:focus-withi
   html { scroll-behavior:auto !important; }
 }
 
-/* Says which of the two silent states the feed is in. Not a panel: no shadow,
-   no border radius beyond the system 3px, and it never takes focus. */
-.cs-paused { position:fixed; right:14px; bottom:14px; z-index:2147483646; padding:6px 11px; border:1px solid var(--cs-line); border-radius:3px; background:var(--cs-surface); color:var(--cs-slate); font:500 12px/1 var(--cs-sans); pointer-events:none; }
+/* Says which mode and profile are on, or which of the two silent states the
+   feed is in. Not a panel: no shadow, no border radius beyond the system 3px,
+   and it never takes focus. Bottom-left, clear of LinkedIn's messaging dock;
+   a toast covers it while one is up. */
+.cs-status { position:fixed; left:14px; bottom:14px; z-index:2147483646; padding:6px 11px; border:1px solid var(--cs-line); border-radius:3px; background:var(--cs-surface); color:var(--cs-slate); font:500 12px/1 var(--cs-sans); pointer-events:none; }

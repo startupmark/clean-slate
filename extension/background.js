@@ -75,3 +75,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     applyIcon(dark);
   }
 });
+
+// Keyboard shortcuts, declared under "commands" in the manifest. Hide and show
+// act on a post, so they go to the feed tab; review opens from anywhere.
+chrome.commands.onCommand.addListener(async (command, tab) => {
+  if (command === "open-review") {
+    chrome.tabs.create({ url: chrome.runtime.getURL("review.html") });
+    return;
+  }
+  const action = { "hide-post": "hide", "show-post": "show" }[command];
+  if (!action) return;
+  const target = tab || (await chrome.tabs.query({ active: true, currentWindow: true }))[0];
+  if (!target?.id || !target.url?.startsWith("https://www.linkedin.com/")) return;
+  try {
+    await chrome.tabs.sendMessage(target.id, { type: "clean-slate:shortcut", action });
+  } catch (_) { /* the page has not loaded the content script yet */ }
+});
